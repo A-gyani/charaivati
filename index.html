@@ -705,7 +705,28 @@ window.__applyRemote = (data)=>{ state.tasks=data.tasks||[]; state.log=data.log|
 window.__setSyncStatus = (html)=>{ const b=document.getElementById('syncBar'); if(b) b.innerHTML=html; };
 
 renderStat();
-if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
+
+/* ---------- service worker: register + auto-update so new deploys land without
+   the manual "close the app / clear cache" dance on phone ---------- */
+if('serviceWorker' in navigator){
+  let refreshing=false;
+  const hadController = !!navigator.serviceWorker.controller;   // false only on first-ever install
+  navigator.serviceWorker.addEventListener('controllerchange', ()=>{
+    // a new worker took control → reload once to show the fresh version.
+    // skip the very first install (no prior controller) to avoid a needless reload.
+    if(refreshing || !hadController) return;
+    refreshing=true; window.location.reload();
+  });
+  navigator.serviceWorker.register('sw.js').then(reg=>{
+    reg.update();                                   // check for a new version now
+    setInterval(()=>reg.update(), 60*60*1000);      // …and hourly while the app stays open
+  }).catch(()=>{});
+  // re-check whenever the app comes back to the foreground (installed PWAs rarely reload)
+  document.addEventListener('visibilitychange', ()=>{
+    if(document.visibilityState==='visible' && navigator.serviceWorker.controller)
+      navigator.serviceWorker.ready.then(reg=>reg.update()).catch(()=>{});
+  });
+}
 </script>
 
 <!-- ============ FIREBASE SYNC (live laptop ↔ phone) ============ -->
