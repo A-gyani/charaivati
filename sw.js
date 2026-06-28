@@ -1,5 +1,5 @@
 // Momentum service worker — offline-first cache of the app shell.
-const CACHE = 'charaivati-v17';
+const CACHE = 'charaivati-v18';
 const SHELL = ['index.html', 'manifest.webmanifest', 'icon.svg'];
 
 self.addEventListener('install', e => {

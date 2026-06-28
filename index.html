@@ -714,8 +714,9 @@ if('serviceWorker' in navigator){
   const hadController = !!navigator.serviceWorker.controller;   // false only on first-ever install
   navigator.serviceWorker.addEventListener('controllerchange', ()=>{
     // a new worker took control → reload once to show the fresh version.
-    // skip the very first install (no prior controller) to avoid a needless reload.
-    if(refreshing || !hadController) return;
+    // skip the very first install (no prior controller) to avoid a needless reload,
+    // and never reload mid sign-in (it would drop the auth result).
+    if(refreshing || !hadController || window.__authBusy) return;
     refreshing=true; window.location.reload();
   });
   navigator.serviceWorker.register('sw.js').then(reg=>{
@@ -775,20 +776,24 @@ if(NOT_SET){
   let user=null, userDoc=null, lastJSON=null, mergedOnce=false, pushT=null;
   const ok = u => '<i class="ph ph-cloud-check"></i> Synced · '+(u.email||'')+' '+signOutLink;
 
-  const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
   window.signInGoogle = async ()=>{
     const provider = new GoogleAuthProvider();
+    window.__authBusy = true;                                    // pause SW auto-reload during sign-in
     setStatus('<i class="ph ph-cloud-arrow-up"></i> opening sign-in…');
     try{
-      if(isMobile){ await signInWithRedirect(auth, provider); }   // popups are unreliable on phones
-      else{ await signInWithPopup(auth, provider); }
+      // Popup keeps the whole flow in one browsing context, so it survives the
+      // third-party-storage partitioning that breaks signInWithRedirect when the
+      // app domain (github.io) differs from the auth domain (firebaseapp.com).
+      await signInWithPopup(auth, provider);
+      window.__authBusy = false;
     }catch(e){
-      try{ await signInWithRedirect(auth, provider); }            // fall back to redirect if popup blocked
-      catch(e2){ alert('Sign-in failed: '+(e2.code||e2.message)); setStatus(btn('Sign in to sync laptop ↔ phone')); }
+      try{ await signInWithRedirect(auth, provider); }            // popup blocked → full-page redirect
+      catch(e2){ window.__authBusy=false; alert('Sign-in failed: '+(e2.code||e2.message)); setStatus(btn('Sign in to sync laptop ↔ phone')); }
     }
   };
-  // finish a redirect sign-in when we land back from Google (mobile)
-  getRedirectResult(auth).catch(e=>{ alert('Sign-in failed: '+(e.code||e.message)); });
+  // finish a redirect sign-in when we land back from Google (only the fallback path uses this)
+  window.__authBusy = true;
+  getRedirectResult(auth).catch(()=>{}).finally(()=>{ window.__authBusy = false; });
   window.signOutMomentum = ()=>signOut(auth);
 
   window.__syncPush = ()=>{                    // debounced cloud write on every local change
