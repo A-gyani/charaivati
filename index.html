@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#f7f2e8" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+  <title>Charaivati</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+  <style>
+    :root{
+      --bg:#f7f2e8; --card:#ffffff; --card2:#f2ece0; --line:#eae0cf;
+      --txt:#34423d; --dim:#998f7e; --accent:#1e8778; --accent2:#2aa392;
+      --coral:#f28c6b; --warn:#f28c6b; --radius:22px;
+      --shadow:0 4px 18px rgba(150,135,110,.16);
+    }
+    *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+    html,body{margin:0; height:100%}
+    body{
+      background:var(--bg); color:var(--txt);
+      font-family:'Nunito',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+      padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+      display:flex; flex-direction:column; min-height:100%;
+    }
+    .wrap{max-width:520px; margin:0 auto; width:100%; padding:18px 16px 90px; flex:1; position:relative; z-index:1}
+    h1{font-size:24px; margin:6px 0 2px; letter-spacing:-.3px; font-weight:800}
+    .sub{color:var(--dim); font-size:14px; margin-bottom:18px; font-weight:600}
+    button{font-family:inherit; cursor:pointer; border:none; color:var(--txt)}
+    .hidden{display:none !important}
+
+    /* icons (Phosphor) */
+    .ph{vertical-align:-2px; line-height:1}
+    .chip i{margin-right:5px; font-size:15px}
+    .links button i{margin-right:6px; font-size:17px; color:var(--accent); vertical-align:-3px}
+    .back i{vertical-align:-3px; margin-right:1px; font-size:16px}
+    .meta i, .first i{color:var(--accent)}
+
+    /* Headspace-style soft background blobs */
+    body::before, body::after{content:''; position:fixed; border-radius:50%; filter:blur(60px); opacity:.55; z-index:0; pointer-events:none}
+    body::before{width:300px; height:300px; background:#bfe3d9; top:-120px; right:-80px}
+    body::after{width:260px; height:260px; background:#ffd2bf; bottom:-90px; left:-80px}
+
+    /* friendly spot illustration */
+    .hero{display:flex; justify-content:center; margin:10px 0 4px}
+    .hero svg{width:118px; height:auto}
+    #home .hero svg{width:80px; height:auto; border-radius:22px; box-shadow:var(--shadow)}
+    .empty .hero svg{width:120px}
+    .wordmark{font-family:'Baloo 2','Nunito',sans-serif; font-weight:800; letter-spacing:0; font-size:40px; line-height:1.1; color:var(--accent); margin-top:14px; text-align:center}
+    #home .sub{text-align:center}
+    .deva{font-family:'Baloo 2','Nunito',sans-serif; color:var(--accent); font-weight:700}
+
+    /* HOME */
+    .stuck{
+      width:100%; padding:28px 18px; border-radius:var(--radius);
+      background:linear-gradient(135deg,#1e8778,#2aa392); color:#fff;
+      font-size:21px; font-weight:700; box-shadow:0 10px 26px rgba(30,135,120,.30);
+      margin-bottom:8px;
+    }
+    .stuck small{display:block; font-weight:500; opacity:.85; font-size:13px; margin-top:4px}
+    .row{display:flex; gap:8px; flex-wrap:wrap; margin:14px 0}
+    .chip{
+      background:var(--card); border:1px solid var(--line); color:var(--dim);
+      padding:9px 14px; border-radius:999px; font-size:14px; font-weight:600;
+    }
+    .chip.on{background:var(--accent); border-color:var(--accent); color:#fff}
+    .chip.mood.on{background:var(--accent2); border-color:var(--accent2); color:#fff}
+    .label{font-size:12px; color:var(--dim); text-transform:uppercase; letter-spacing:.6px; margin:18px 0 4px}
+    .links{display:flex; gap:10px; margin-top:22px}
+    .links button{flex:1; background:var(--card); border:1px solid var(--line); padding:13px; border-radius:16px; font-size:14px; font-weight:600; color:var(--txt); box-shadow:var(--shadow)}
+    .stat{color:var(--dim); font-size:13px; text-align:center; margin-top:16px}
+    .stat b{color:var(--accent2)}
+
+    /* SERVE CARD — calm, centred, lots of breathing room */
+    .serve{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:30px 22px 26px; margin-top:6px; text-align:center; box-shadow:var(--shadow)}
+    .serve .mins{color:var(--accent); font-weight:700; font-size:12px; letter-spacing:1px; text-transform:uppercase}
+    .serve h2{font-size:23px; margin:10px 0 4px; line-height:1.3; font-weight:700}
+    .serve .first{background:var(--card2); border-left:3px solid var(--accent2); padding:12px 14px; border-radius:10px; margin:16px 0; font-size:15px; text-align:left}
+    .serve .first span{display:block; color:var(--dim); font-size:11px; text-transform:uppercase; letter-spacing:.6px; margin-bottom:3px}
+    .serve .meta{color:var(--dim); font-size:13px; margin-top:6px}
+
+    /* timer as a depleting ring (goal-gradient) — cool by default, amber (never red) near the end */
+    .ringWrap{position:relative; width:200px; height:200px; margin:26px auto 22px}
+    .ring{width:100%; height:100%; transform:rotate(-90deg)}
+    .ring circle{fill:none; stroke-width:9; stroke-linecap:round}
+    .ring-bg{stroke:var(--card2)}
+    .ring-fg{stroke:var(--accent2); stroke-dasharray:327; stroke-dashoffset:0; transition:stroke-dashoffset 1s linear, stroke .4s}
+    .ring-fg.warn{stroke:var(--warn)}
+    .ringTime{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:50px; font-weight:900; font-variant-numeric:tabular-nums; letter-spacing:.5px}
+    .ringTime.warn{color:var(--warn)}
+
+    /* actions — "Done" is the hero (peak-end rule) */
+    .acts{margin-top:18px}
+    .primary{width:100%; background:var(--accent2); color:#fff; padding:18px; border-radius:16px; font-size:18px; font-weight:800; box-shadow:0 8px 20px rgba(42,163,146,.32); transition:transform .1s}
+    .primary:active{transform:scale(.97)}
+    .acts2{display:flex; gap:10px; margin-top:10px}
+    .acts2 button{flex:1; background:var(--card2); border:1px solid var(--line); color:var(--dim); padding:13px; border-radius:14px; font-size:14px; font-weight:600}
+
+    /* peak-end celebration — the end moment users remember */
+    .peak{position:fixed; inset:0; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px; z-index:50; opacity:0; pointer-events:none; transition:opacity .3s}
+    .peak.show{opacity:1; pointer-events:auto}
+    .peak svg{width:112px; height:112px}
+    .pc-circle{fill:none; stroke:var(--accent2); stroke-width:4; stroke-dasharray:289; stroke-dashoffset:289}
+    .pc-check{fill:none; stroke:var(--accent2); stroke-width:6; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:62; stroke-dashoffset:62}
+    .peak.show .pc-circle{animation:draw .5s ease-out forwards}
+    .peak.show .pc-check{animation:draw .35s .35s ease-out forwards}
+    @keyframes draw{to{stroke-dashoffset:0}}
+    .peakMsg{font-size:20px; font-weight:800; text-align:center; padding:0 30px; opacity:0; animation:rise .4s .55s ease-out forwards}
+    @keyframes rise{from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:translateY(0)}}
+
+    /* served-task entrance animation */
+    .serve.enter{animation:cardIn .45s cubic-bezier(.2,.7,.2,1)}
+    @keyframes cardIn{from{opacity:0; transform:translateY(14px) scale(.985)} to{opacity:1; transform:none}}
+
+    /* confetti burst on Done */
+    .conf{position:absolute; left:50%; top:42%; width:10px; height:10px; border-radius:2px; pointer-events:none; opacity:0; animation:conf .8s ease-out forwards}
+    @keyframes conf{0%{opacity:1; transform:translate(-50%,-50%) scale(.3)} 100%{opacity:0; transform:translate(calc(-50% + var(--tx)),calc(-50% + var(--ty))) scale(1) rotate(200deg)}}
+
+    /* FORM / LIST */
+    input,select,textarea{
+      width:100%; background:var(--card); border:1px solid var(--line); color:var(--txt);
+      padding:13px; border-radius:12px; font-size:15px; font-family:inherit; margin-top:6px;
+    }
+    textarea{resize:vertical; min-height:46px}
+    .field{margin-bottom:14px}
+    .field>label{font-size:13px; color:var(--dim); font-weight:600}
+    .save{width:100%; background:var(--accent); color:#fff; padding:16px; border-radius:16px; font-size:16px; font-weight:700; margin-top:6px; box-shadow:0 8px 20px rgba(30,135,120,.28)}
+    .item{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:14px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:flex-start; gap:10px; box-shadow:var(--shadow)}
+    .item .t{font-weight:600; font-size:15px}
+    .item .d{color:var(--dim); font-size:12px; margin-top:3px}
+    .item .b{background:var(--card2); border:1px solid var(--line); color:var(--dim); font-size:11px; padding:3px 8px; border-radius:999px; white-space:nowrap}
+    .del{background:none; color:#e5736b; font-size:18px; line-height:1; padding:0 4px}
+    .empty{color:var(--dim); text-align:center; padding:30px 10px; font-size:14px}
+    .back{background:none; color:var(--accent); font-size:14px; font-weight:600; margin-bottom:8px}
+    .toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:var(--accent2); color:#fff; padding:11px 18px; border-radius:999px; font-weight:700; font-size:14px; box-shadow:0 6px 20px rgba(42,163,146,.4); opacity:0; transition:opacity .25s; pointer-events:none}
+    .toast.show{opacity:1}
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ HOME ============ -->
+  <section id="home">
+    <div class="hero">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Charaivati">
+        <rect width="120" height="120" rx="27" fill="#1e8778"/>
+        <circle cx="60" cy="54" r="18" fill="#f28c6b"/>
+        <rect x="26" y="78" width="68" height="6" rx="3" fill="#f7f2e8" opacity="0.92"/>
+        <rect x="36" y="90" width="48" height="6" rx="3" fill="#f7f2e8" opacity="0.6"/>
+      </svg>
+    </div>
+    <h1 class="wordmark">चरैवेति</h1>
+    <div class="sub">Small actions. Right mood. Big change.</div>
+
+    <button class="stuck" onclick="serve()">
+      I'm stuck — give me one
+      <small>Picks a single task that fits your time &amp; mood</small>
+    </button>
+
+    <div class="label">I have…</div>
+    <div class="row" id="timeChips">
+      <button class="chip on" data-min="0">any time</button>
+      <button class="chip" data-min="2">2 min</button>
+      <button class="chip" data-min="5">5 min</button>
+      <button class="chip" data-min="10">10 min</button>
+      <button class="chip" data-min="15">15 min</button>
+    </div>
+
+    <div class="label">I feel… <span style="text-transform:none;letter-spacing:0">(optional)</span></div>
+    <div class="row" id="moodChips">
+      <button class="chip mood" data-mood="anxious"><i class="ph ph-cloud-rain"></i>anxious</button>
+      <button class="chip mood" data-mood="bored"><i class="ph ph-smiley-meh"></i>bored</button>
+      <button class="chip mood" data-mood="overwhelmed"><i class="ph ph-waves"></i>overwhelmed</button>
+      <button class="chip mood" data-mood="ok"><i class="ph ph-smiley"></i>fine</button>
+    </div>
+
+    <div class="links">
+      <button onclick="show('form')"><i class="ph ph-plus-circle"></i>Add task</button>
+      <button onclick="renderList(); show('list')"><i class="ph ph-list-bullets"></i>Browse</button>
+    </div>
+    <div class="stat" id="stat"></div>
+    <div class="stat" id="syncBar" style="margin-top:10px"></div>
+  </section>
+
+  <!-- ============ SERVE ============ -->
+  <section id="serve" class="hidden">
+    <button class="back" onclick="stopTimer(); show('home')"><i class="ph ph-arrow-left"></i>back</button>
+    <div class="serve" id="serveCard"></div>
+  </section>
+
+  <!-- ============ ADD FORM ============ -->
+  <section id="form" class="hidden">
+    <button class="back" onclick="show('home')"><i class="ph ph-arrow-left"></i>back</button>
+    <h1>Add a task</h1>
+    <div class="sub">Keep it tiny. If it's big, write the 2-minute first move.</div>
+
+    <div class="field"><label>What's the task?</label>
+      <input id="f_title" placeholder="e.g. Reply to the landlord email" /></div>
+
+    <div class="field"><label>2-minute first move <span style="color:var(--dim)">(for scary/big tasks)</span></label>
+      <input id="f_first" placeholder="e.g. Open the email and read it once" /></div>
+
+    <div class="field"><label>How long does the first chunk take?</label>
+      <select id="f_min">
+        <option value="2">2 minutes</option>
+        <option value="5" selected>5 minutes</option>
+        <option value="10">10 minutes</option>
+        <option value="15">15 minutes</option>
+      </select></div>
+
+    <div class="field"><label>Priority</label>
+      <select id="f_pri">
+        <option value="3">High</option>
+        <option value="2" selected>Medium</option>
+        <option value="1">Low</option>
+      </select></div>
+
+    <div class="field"><label>If-then trigger <span style="color:var(--dim)">(optional)</span></label>
+      <input id="f_trig" placeholder="e.g. When I sit at my desk after lunch" /></div>
+
+    <div class="field"><label>Reward to pair it with <span style="color:var(--dim)">(optional)</span></label>
+      <input id="f_rew" placeholder="e.g. favourite playlist while I do it" /></div>
+
+    <button class="save" onclick="saveTask()">Save task</button>
+  </section>
+
+  <!-- ============ LIST ============ -->
+  <section id="list" class="hidden">
+    <button class="back" onclick="show('home')"><i class="ph ph-arrow-left"></i>back</button>
+    <h1>All tasks</h1>
+    <div class="sub">Browse mode — the home screen shows you just one at a time.</div>
+    <div id="listBody"></div>
+  </section>
+
+</div>
+
+<!-- peak-end celebration (shown briefly on Done) -->
+<div class="peak" id="peak">
+  <svg viewBox="0 0 100 100">
+    <circle class="pc-circle" cx="50" cy="50" r="46"></circle>
+    <path class="pc-check" d="M30 52 L45 66 L72 36"></path>
+  </svg>
+  <div class="peakMsg" id="peakMsg"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY='momentum.v1';
+let state = load();
+let timer = null, remaining = 0, total = 0, currentId = null;
+let filterMin = 0, mood = null;
+const RING_C = 327;   // circumference of the r=52 timer ring
+
+function load(){
+  try{ return JSON.parse(localStorage.getItem(KEY)) || {tasks:[], log:[]}; }
+  catch(e){ return {tasks:[], log:[]}; }
+}
+function saveLocalOnly(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+function save(){ saveLocalOnly(); if(window.__syncPush) window.__syncPush(); }
+function uid(){ return Math.random().toString(36).slice(2,9); }
+function todayKey(){ const d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+
+function show(id){
+  ['home','serve','form','list'].forEach(s=>document.getElementById(s).classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  if(id==='home') renderStat();
+  window.scrollTo(0,0);
+}
+function toast(msg){
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1600);
+}
+
+/* ---------- chips ---------- */
+document.getElementById('timeChips').addEventListener('click', e=>{
+  const b=e.target.closest('.chip'); if(!b) return;
+  [...e.currentTarget.children].forEach(c=>c.classList.remove('on'));
+  b.classList.add('on'); filterMin = +b.dataset.min;
+});
+document.getElementById('moodChips').addEventListener('click', e=>{
+  const b=e.target.closest('.chip'); if(!b) return;
+  const was=b.classList.contains('on');
+  [...e.currentTarget.children].forEach(c=>c.classList.remove('on'));
+  if(!was){ b.classList.add('on'); mood=b.dataset.mood; } else { mood=null; }
+});
+
+/* ---------- the real-time selection: a scoring function, no AI ---------- */
+function pickTask(){
+  const open = state.tasks.filter(t=>!t.done);
+  let pool = open;
+  if(filterMin>0) pool = open.filter(t=>t.min<=filterMin);
+  if(pool.length===0) pool = open;            // nothing fits the window → relax
+  if(pool.length===0) return null;
+
+  const now = Date.now();
+  let best=null, bestScore=-1e9;
+  for(const t of pool){
+    let s=0;
+    s += t.pri*10;                                          // priority
+    const ageDays=(now-t.createdAt)/8.64e7; s += Math.min(ageDays,14)*1.5;   // aging floats old tasks up
+    const sinceShown=(now-(t.lastShownAt||0))/6e4; s += Math.min(sinceShown,180)*0.05; // freshness: avoid repeats
+    if(mood==='anxious'||mood==='overwhelmed') s += (16-t.min);  // dread → smallest on-ramp first
+    if(mood==='bored') s += (t.reward?8:0);                      // bored → bundle a reward
+    s += Math.random()*4;                                        // jitter so it feels alive
+    if(s>bestScore){ bestScore=s; best=t; }
+  }
+  return best;
+}
+
+function serve(){
+  const t = pickTask();
+  if(!t){ toast('No tasks yet — add one'); show('form'); return; }
+  currentId = t.id;
+  started = false;
+  t.lastShownAt = Date.now(); save();
+  remaining = total = t.min*60;
+  renderServe(t);
+  show('serve');
+  startTimer();
+}
+
+function renderServe(t){
+  document.getElementById('serveCard').innerHTML = `
+    <div class="mins">${t.min} minute start</div>
+    <h2>${esc(t.title)}</h2>
+    ${t.first?`<div class="first"><span>first move</span>${esc(t.first)}</div>`:''}
+    ${t.trig?`<div class="meta"><i class="ph ph-bell-ringing"></i> ${esc(t.trig)}</div>`:''}
+    ${t.reward?`<div class="meta"><i class="ph ph-headphones"></i> ${esc(t.reward)}</div>`:''}
+    <div class="ringWrap">
+      <svg class="ring" viewBox="0 0 120 120">
+        <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
+        <circle class="ring-fg" id="ringFg" cx="60" cy="60" r="52"></circle>
+      </svg>
+      <div class="ringTime" id="clock"></div>
+    </div>
+    <div class="acts"><button class="primary" onclick="done()"><i class="ph-bold ph-check"></i> Done</button></div>
+    <div class="acts2">
+      <button onclick="keepGoing()"><i class="ph ph-plus"></i> Keep going +5</button>
+      <button onclick="swap()"><i class="ph ph-shuffle"></i> Different one</button>
+    </div>`;
+  updateClock();
+  const card=document.getElementById('serveCard');           // replay entrance each serve
+  card.classList.remove('enter'); void card.offsetWidth; card.classList.add('enter');
+}
+
+function updateClock(){
+  const clock=document.getElementById('clock'); if(!clock) return;
+  const r=Math.max(0,remaining);
+  clock.textContent = String(Math.floor(r/60)).padStart(2,'0')+':'+String(r%60).padStart(2,'0');
+  const fg=document.getElementById('ringFg');
+  if(fg && total>0) fg.style.strokeDashoffset = RING_C*(1 - r/total);
+  const warn = remaining<=30 && remaining>0;
+  clock.classList.toggle('warn', warn);
+  if(fg) fg.classList.toggle('warn', warn);
+}
+
+function startTimer(){
+  stopTimer();
+  updateClock();
+  timer=setInterval(()=>{
+    remaining--;
+    if(!document.getElementById('clock')){ stopTimer(); return; }
+    updateClock();
+    if(remaining<=0){
+      stopTimer();
+      const c=document.getElementById('clock'); if(c) c.textContent='nice — keep going?';
+      if(navigator.vibrate) navigator.vibrate(120);
+    }
+  },1000);
+}
+function stopTimer(){ if(timer){clearInterval(timer); timer=null;} }
+
+function logStart(){ state.log.push({d:todayKey(), at:Date.now()}); save(); }
+
+const AFFIRM = ["That's momentum.","You started — that was the hard part.","One more brick laid.","Future-you says thanks.","Done beats perfect.","Bank that win.","चरैवेति — just keep going."];
+function done(){
+  stopTimer();
+  logStart();                                   // we celebrate STARTS; completion is a bonus
+  const t=state.tasks.find(x=>x.id===currentId);
+  if(t) t.done=true; save();
+  showPeak();                                   // peak-end: make the ending feel good
+}
+function showPeak(){
+  const p=document.getElementById('peak');
+  document.getElementById('peakMsg').textContent = AFFIRM[Math.floor(Math.random()*AFFIRM.length)];
+  p.classList.remove('show'); void p.offsetWidth; p.classList.add('show');  // restart the draw animation
+  if(navigator.vibrate) navigator.vibrate([18,40,28]);
+  burst(p);
+  setTimeout(()=>{ p.classList.remove('show'); show('home'); }, 1900);
+}
+function burst(p){
+  const colors=['#1e8778','#2aa392','#f28c6b','#ffce6b','#7fcdbf'];
+  for(let i=0;i<18;i++){
+    const s=document.createElement('span'); s.className='conf';
+    const a=(Math.PI*2*i)/18 + Math.random()*0.5, d=70+Math.random()*70;
+    s.style.setProperty('--tx',(Math.cos(a)*d).toFixed(1)+'px');
+    s.style.setProperty('--ty',(Math.sin(a)*d).toFixed(1)+'px');
+    s.style.background=colors[i%colors.length];
+    s.style.animationDelay=(Math.random()*0.12).toFixed(2)+'s';
+    p.appendChild(s);
+    setTimeout(()=>s.remove(),1000);
+  }
+}
+function keepGoing(){ remaining += 5*60; total += 5*60; logStartIfNew(); startTimer(); toast('+5 minutes'); }
+let started=false;
+function logStartIfNew(){ if(!started){ logStart(); started=true; } }
+function swap(){ stopTimer(); started=false; serve(); }
+
+/* ---------- add ---------- */
+function saveTask(){
+  const title=document.getElementById('f_title').value.trim();
+  if(!title){ toast('Give it a title'); return; }
+  state.tasks.push({
+    id:uid(), title,
+    first:document.getElementById('f_first').value.trim(),
+    min:+document.getElementById('f_min').value,
+    pri:+document.getElementById('f_pri').value,
+    trig:document.getElementById('f_trig').value.trim(),
+    reward:document.getElementById('f_rew').value.trim(),
+    createdAt:Date.now(), lastShownAt:0, done:false
+  });
+  save();
+  ['f_title','f_first','f_trig','f_rew'].forEach(i=>document.getElementById(i).value='');
+  toast('Added');
+  show('home');
+}
+
+/* ---------- list ---------- */
+function renderList(){
+  const open=state.tasks.filter(t=>!t.done);
+  const body=document.getElementById('listBody');
+  if(open.length===0){ body.innerHTML='<div class="empty"><div class="hero"><svg viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="110" cy="74" r="23" fill="#ffce6b"/><path d="M0 96 Q55 72 110 90 T220 86 V130 H0 Z" fill="#2fbe96"/><path d="M0 112 Q60 90 120 106 T220 104 V130 H0 Z" fill="#14b8a6"/></svg></div>No open tasks yet.<br>Add a few tiny ones and you\'ll never wonder what to do next.</div>'; return; }
+  const P={3:'High',2:'Med',1:'Low'};
+  body.innerHTML = open
+    .sort((a,b)=>b.pri-a.pri || a.createdAt-b.createdAt)
+    .map(t=>`<div class="item">
+      <div><div class="t">${esc(t.title)}</div>
+        <div class="d">${t.first?'→ '+esc(t.first):'no first-move set'}</div></div>
+      <div style="text-align:right">
+        <div class="b">${t.min}m · ${P[t.pri]}</div>
+        <button class="del" onclick="delTask('${t.id}')" title="delete"><i class="ph ph-trash"></i></button>
+      </div></div>`).join('');
+}
+function delTask(id){ state.tasks=state.tasks.filter(t=>t.id!==id); save(); renderList(); }
+
+/* ---------- stat (no streaks, no guilt) ---------- */
+function renderStat(){
+  const n=state.log.filter(l=>l.d===todayKey()).length;
+  document.getElementById('stat').innerHTML = n>0
+    ? `<b>${n}</b> ${n===1?'thing':'things'} started today. Momentum is working.`
+    : `Every big thing starts with 2 minutes. Tap the button.`;
+}
+
+function esc(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* seed a couple of examples on first ever run */
+if(state.tasks.length===0 && state.log.length===0){
+  state.tasks=[
+    {id:uid(),title:"Reply to the oldest unread email",first:"Open inbox, open the top one, read it",min:5,pri:3,trig:"",reward:"",createdAt:Date.now(),lastShownAt:0,done:false},
+    {id:uid(),title:"Tidy desk surface",first:"Put 3 things where they belong",min:2,pri:1,trig:"",reward:"a song you like",createdAt:Date.now(),lastShownAt:0,done:false},
+    {id:uid(),title:"Outline the thing you're avoiding",first:"Open a blank doc and type the title only",min:10,pri:3,trig:"When I sit down after coffee",reward:"",createdAt:Date.now(),lastShownAt:0,done:false}
+  ];
+  save();
+}
+/* ---------- bridge to the sync layer (module script below) ---------- */
+function rerenderCurrent(){
+  renderStat();
+  if(!document.getElementById('list').classList.contains('hidden')) renderList();
+  if(!document.getElementById('serve').classList.contains('hidden')){
+    const t=state.tasks.find(x=>x.id===currentId); if(t) renderServe(t);
+  }
+}
+window.__syncGetData = ()=>({tasks:state.tasks, log:state.log});
+window.__applyRemote = (data)=>{ state.tasks=data.tasks||[]; state.log=data.log||[]; saveLocalOnly(); rerenderCurrent(); };
+window.__setSyncStatus = (html)=>{ const b=document.getElementById('syncBar'); if(b) b.innerHTML=html; };
+
+renderStat();
+if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
+</script>
+
+<!-- ============ FIREBASE SYNC (live laptop ↔ phone) ============ -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager,
+         doc, setDoc, onSnapshot, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* ⬇️⬇️ PASTE YOUR FIREBASE CONFIG HERE ⬇️⬇️
+   Firebase console → Project settings (gear) → "Your apps" → Web app → Config */
+const firebaseConfig = {
+  apiKey: "AIzaSyCNzV7bjmBNme0blEa8OtXYyLP0a5sb5UM",
+  authDomain: "charaivati-15e2a.firebaseapp.com",
+  projectId: "charaivati-15e2a",
+  appId: "1:626538442947:web:78678329ff5a32ca82f276"
+};
+/* ⬆️⬆️ (the apiKey is NOT a secret — security comes from the Firestore rules) ⬆️⬆️ */
+
+const NOT_SET = firebaseConfig.apiKey === "PASTE_ME";
+const setStatus = h => window.__setSyncStatus && window.__setSyncStatus(h);
+const dataJSON  = d => JSON.stringify({tasks:d.tasks||[], log:d.log||[]});
+const btn = label => '<button onclick="signInGoogle()" style="background:#fff1e6;border:1px solid #f1e6d8;color:#3a332e;padding:9px 14px;border-radius:999px;font-weight:700;font-size:13px;cursor:pointer"><i class="ph ph-cloud"></i> '+label+'</button>';
+const signOutLink = '<a href="#" onclick="signOutMomentum();return false" style="color:#a0917f">sign out</a>';
+
+function unionData(local, remote){            // one-time merge so pre-sync tasks aren't lost
+  const byId={};
+  (remote.tasks||[]).forEach(t=>byId[t.id]=t);
+  (local.tasks||[]).forEach(t=>{ if(!byId[t.id]) byId[t.id]=t; });
+  const seen=new Set(), log=[];
+  [...(remote.log||[]), ...(local.log||[])].forEach(l=>{ const k=(l.at||l.d); if(!seen.has(k)){ seen.add(k); log.push(l);} });
+  return { tasks:Object.values(byId), log };
+}
+
+if(NOT_SET){
+  setStatus('<i class="ph ph-cloud-slash"></i> Sync off — paste your Firebase config in index.html');
+  window.signInGoogle = ()=>alert('Add your Firebase config in index.html first (see the setup steps).');
+} else {
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = initializeFirestore(app, { localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }) });
+
+  let user=null, userDoc=null, lastJSON=null, mergedOnce=false, pushT=null;
+  const ok = u => '<i class="ph ph-cloud-check"></i> Synced · '+(u.email||'')+' '+signOutLink;
+
+  window.signInGoogle    = async ()=>{ try{ await signInWithPopup(auth, new GoogleAuthProvider()); }catch(e){ alert('Sign-in failed: '+e.message); } };
+  window.signOutMomentum = ()=>signOut(auth);
+
+  window.__syncPush = ()=>{                    // debounced cloud write on every local change
+    if(!user||!userDoc) return;
+    clearTimeout(pushT);
+    pushT=setTimeout(async ()=>{
+      const d=window.__syncGetData(), js=dataJSON(d);
+      if(js===lastJSON) return;                // nothing actually changed
+      lastJSON=js;
+      try{ await setDoc(userDoc,{tasks:d.tasks, log:d.log, updatedAt:serverTimestamp()}); }catch(e){}
+    },600);
+  };
+
+  onAuthStateChanged(auth, u=>{
+    user=u; mergedOnce=false; userDoc=null;
+    if(!u){ setStatus(btn('Sign in to sync laptop ↔ phone')); return; }
+    userDoc=doc(db,'users',u.uid);
+    setStatus('<i class="ph ph-cloud-arrow-up"></i> syncing…');
+    onSnapshot(userDoc, snap=>{
+      const local=window.__syncGetData();
+      if(!snap.exists()){                      // first device ever → push local up
+        lastJSON=dataJSON(local);
+        setDoc(userDoc,{tasks:local.tasks, log:local.log, updatedAt:serverTimestamp()}).catch(()=>{});
+        setStatus(ok(u)); return;
+      }
+      const remote=snap.data();
+      if(!mergedOnce){                          // one-time union with whatever was already here
+        mergedOnce=true;
+        const merged=unionData(local,remote);
+        window.__applyRemote(merged); lastJSON=dataJSON(merged);
+        if(dataJSON(merged)!==dataJSON(remote))
+          setDoc(userDoc,{tasks:merged.tasks, log:merged.log, updatedAt:serverTimestamp()}).catch(()=>{});
+        setStatus(ok(u)); return;
+      }
+      const rjs=dataJSON(remote);               // ongoing: cloud is the source of truth
+      if(rjs!==dataJSON(local)){ window.__applyRemote({tasks:remote.tasks, log:remote.log}); lastJSON=rjs; }
+      setStatus(ok(u));
+    }, err=> setStatus('<i class="ph ph-warning"></i> sync error: '+err.code));
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Charaivati">
+  <rect width="120" height="120" rx="27" fill="#1e8778"/>
+  <circle cx="60" cy="54" r="18" fill="#f28c6b"/>
+  <rect x="26" y="78" width="68" height="6" rx="3" fill="#f7f2e8" opacity="0.92"/>
+  <rect x="36" y="90" width="48" height="6" rx="3" fill="#f7f2e8" opacity="0.6"/>
+</svg>

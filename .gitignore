@@ -1,0 +1,9 @@
+# Server-side automation — NEVER publish (contains service-account.json secret + node_modules)
+automation/
+
+# Local tooling, logs, and image assets not needed by the live app
+.claude/
+*.png
+*.jpg
+*.jpeg
+*.log
