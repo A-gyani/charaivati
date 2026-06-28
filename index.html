@@ -274,13 +274,13 @@
 
       <div class="field"><label class="chkline"><input type="checkbox" id="f_recur" class="chk"> Repeating task <span style="color:var(--dim);font-weight:500">(comes back after you finish it)</span></label></div>
 
-      <div class="field"><label>Then do… <span style="color:var(--dim)">(pair a follow-on task)</span></label>
+      <div class="field"><label>Then do… <span style="color:var(--dim)">(start another task right after)</span></label>
         <select id="f_then"><option value="">— none —</option></select></div>
 
-      <div class="field"><label>If-then trigger <span style="color:var(--dim)">(optional)</span></label>
+      <div class="field"><label>When will you do it? <span style="color:var(--dim)">(optional)</span></label>
         <input id="f_trig" placeholder="e.g. When I sit at my desk after lunch" /></div>
 
-      <div class="field"><label>Reward to pair it with <span style="color:var(--dim)">(optional)</span></label>
+      <div class="field"><label>Pair it with a reward <span style="color:var(--dim)">(optional)</span></label>
         <input id="f_rew" placeholder="e.g. favourite playlist while I do it" /></div>
     </div>
 
@@ -457,7 +457,7 @@ function renderServe(t){
   const multi=steps.length>1;
   const isLast=idx>=steps.length-1;
   document.getElementById('serveCard').innerHTML = `
-    <div class="mins">${step.min} minute ${multi?'step':'start'}</div>
+    <div class="mins">${multi?'step · ':''}${step.min} min</div>
     <h2>${esc(t.title)}</h2>
     ${stepProgressHTML(t)}
     ${step.text?`<div class="first"><span>${multi?'this step':'first move'}</span>${esc(step.text)}</div>`:''}
@@ -486,8 +486,8 @@ function renderSoundRow(){
   const el=document.getElementById('soundRow'); if(!el) return;
   const m=state.settings.muted, tk=state.settings.tick;
   el.innerHTML = `
-    <button onclick="toggleMute()">${m?'<i class="ph ph-speaker-simple-slash"></i> muted':'<i class="ph ph-speaker-simple-high"></i> sound on'}</button>
-    <button onclick="toggleTick()" class="${tk&&!m?'on':''}"><i class="ph ph-timer"></i> ${tk?'tick on':'tick off'}</button>`;
+    <button onclick="toggleMute()" class="${!m?'on':''}">${m?'<i class="ph ph-speaker-simple-slash"></i> Sound: off':'<i class="ph ph-speaker-simple-high"></i> Sound: on'}</button>
+    <button onclick="toggleTick()" class="${tk&&!m?'on':''}"><i class="ph ph-timer"></i> Tick: ${tk?'on':'off'}</button>`;
 }
 function toggleMute(){ state.settings.muted=!state.settings.muted; saveLocalOnly(); renderSoundRow(); if(!state.settings.muted) audioCtx(); }
 function toggleTick(){ state.settings.tick=!state.settings.tick; saveLocalOnly(); renderSoundRow(); }
@@ -587,7 +587,7 @@ function renderNextUp(){
   const t = pendingNext && state.tasks.find(x=>x.id===pendingNext && !x.done);
   if(!t){ el.classList.add('hidden'); el.innerHTML=''; pendingNext=null; return; }
   el.classList.remove('hidden');
-  el.innerHTML = `<div class="nuLabel"><i class="ph ph-link"></i> Next up — paired</div>
+  el.innerHTML = `<div class="nuLabel"><i class="ph ph-link"></i> Do this next</div>
     <div class="nuTitle">${esc(t.title)}</div>
     <div class="nuActs">
       <button class="nuStart" onclick="startPaired()">Start it</button>
@@ -666,7 +666,7 @@ function renderList(){
     .sort((a,b)=>b.pri-a.pri || a.createdAt-b.createdAt)
     .map(t=>{
       const steps=getSteps(t); const multi=steps.length>1; const idx=Math.min(t.stepIndex||0, steps.length-1);
-      const desc = multi ? `${steps.length} steps · ${idx} done` : (t.first?'→ '+esc(t.first):'no first-move set');
+      const desc = multi ? `${steps.length} steps · ${idx} done` : (t.first?'→ '+esc(t.first):'no first step yet');
       const badge = `${currentStep(t).min}m · ${P[t.pri]}${t.recur?' · ↻':''}`;
       return `<div class="item">
         <div><div class="t">${esc(t.title)}</div>
