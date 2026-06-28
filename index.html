@@ -231,15 +231,12 @@
   <section id="form" class="hidden">
     <button class="back" onclick="show('home')"><i class="ph ph-arrow-left"></i>back</button>
     <h1>Add a task</h1>
-    <div class="sub">Keep it tiny. If it's big, write the 2-minute first move.</div>
+    <div class="sub">Just name it — we'll suggest the first small step. Tap More options to break a big one down.</div>
 
-    <div class="field"><label>What's the task?</label>
+    <div class="field"><label>What do you need to do?</label>
       <input id="f_title" placeholder="e.g. Reply to the landlord email" /></div>
 
-    <div class="field"><label>2-minute first move <span style="color:var(--dim)">(for scary/big tasks)</span></label>
-      <input id="f_first" placeholder="e.g. Open the email and read it once" /></div>
-
-    <div class="field"><label>How long does the first chunk take?</label>
+    <div class="field"><label>How long is the first step?</label>
       <select id="f_min">
         <option value="2">2 minutes</option>
         <option value="5" selected>5 minutes</option>
@@ -254,9 +251,13 @@
         <option value="1">Low</option>
       </select></div>
 
-    <button class="advToggle" type="button" onclick="toggleAdv()"><i class="ph ph-caret-down" id="advCaret"></i> More options — break it into steps, moods, repeat, pair</button>
+    <button class="advToggle" type="button" onclick="toggleAdv()"><i class="ph ph-caret-down" id="advCaret"></i> More options — first step, steps, moods, repeat, pair</button>
 
     <div id="adv" class="hidden">
+      <div class="field"><label>First tiny step <span style="color:var(--dim)">(optional)</span></label>
+        <input id="f_first" placeholder="e.g. Open the email and read it once" />
+        <div style="color:var(--dim);font-size:12px;margin-top:6px">The smallest way to begin. Leave blank — Charaivati will suggest one for you.</div></div>
+
       <div class="field"><label>Break it into steps <span style="color:var(--dim)">(optional — you'll see one at a time)</span></label>
         <div id="stepsList"></div>
         <button class="addStep" type="button" onclick="addStepRow()"><i class="ph ph-plus"></i> add a step</button>
