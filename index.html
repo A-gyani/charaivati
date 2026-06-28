@@ -485,7 +485,7 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catc
 <!-- ============ FIREBASE SYNC (live laptop ↔ phone) ============ -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager,
          doc, setDoc, onSnapshot, serverTimestamp }
@@ -527,7 +527,20 @@ if(NOT_SET){
   let user=null, userDoc=null, lastJSON=null, mergedOnce=false, pushT=null;
   const ok = u => '<i class="ph ph-cloud-check"></i> Synced · '+(u.email||'')+' '+signOutLink;
 
-  window.signInGoogle    = async ()=>{ try{ await signInWithPopup(auth, new GoogleAuthProvider()); }catch(e){ alert('Sign-in failed: '+e.message); } };
+  const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+  window.signInGoogle = async ()=>{
+    const provider = new GoogleAuthProvider();
+    setStatus('<i class="ph ph-cloud-arrow-up"></i> opening sign-in…');
+    try{
+      if(isMobile){ await signInWithRedirect(auth, provider); }   // popups are unreliable on phones
+      else{ await signInWithPopup(auth, provider); }
+    }catch(e){
+      try{ await signInWithRedirect(auth, provider); }            // fall back to redirect if popup blocked
+      catch(e2){ alert('Sign-in failed: '+(e2.code||e2.message)); setStatus(btn('Sign in to sync laptop ↔ phone')); }
+    }
+  };
+  // finish a redirect sign-in when we land back from Google (mobile)
+  getRedirectResult(auth).catch(e=>{ alert('Sign-in failed: '+(e.code||e.message)); });
   window.signOutMomentum = ()=>signOut(auth);
 
   window.__syncPush = ()=>{                    // debounced cloud write on every local change
