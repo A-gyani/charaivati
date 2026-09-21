@@ -69,6 +69,7 @@ Firestore free (Spark) plan: 1 GB stored, 50K reads + 20K writes/day. A single p
 
 Home → **Work**. A separate list for your main job: tasks with category, priority, due date and a time estimate, ticked off as you go. The **Progress** view shows done-today, streak, this week vs last, on-time rate, a 30-day chart, your average by weekday, a category breakdown and the running numbers.
 
+- Each work task can hold **steps** (sub-tasks): tap the *steps* chip on a task to expand, add and tick them; the chip and a thin bar show progress. Finishing the task ticks all its steps.
 - Work tasks live in `work: { goal, tasks[] }` inside the same `users/{uid}` document, so they sync laptop ↔ phone with no extra setup.
 - They are deliberately invisible to **"I'm stuck — give me one"** and to the bifurcate automation, which only read `tasks[]`.
 - `apply.js` updates only the `tasks` field, so it never touches work data.

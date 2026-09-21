@@ -213,6 +213,26 @@
     .wk-meta .plain{background:none; border-color:transparent; padding-inline:0}
     .wk-empty{color:var(--dim); text-align:center; padding:30px 10px; font-size:14px; background:var(--card); border:1px solid var(--line); border-radius:16px}
     .wk-empty b{display:block; color:var(--txt); font-size:16px; margin-bottom:3px}
+    .wk-meta button.steps{background:var(--card2); border:1px solid var(--line); color:var(--accent); padding:2px 8px; border-radius:999px; font-weight:700; font-size:12px; display:inline-flex; align-items:center; gap:3px}
+    .wk-meta button.steps i{font-size:12px}
+    .wk-subbar{height:4px; background:var(--card2); border-radius:2px; margin-top:8px; overflow:hidden}
+    .wk-subbar i{display:block; height:100%; background:var(--accent2); border-radius:2px}
+    .wk-sub{margin-top:10px; padding-top:6px; border-top:1px dashed var(--line)}
+    .wk-subrow{display:flex; align-items:flex-start; gap:9px; padding:5px 0}
+    .wk-subcheck{width:20px; height:20px; border-radius:50%; border:2px solid var(--line); background:var(--card2); flex:0 0 auto; display:grid; place-items:center; padding:0; margin-top:1px}
+    .wk-subcheck svg{width:11px; height:11px; opacity:0; stroke:#fff; fill:none; stroke-width:3; stroke-linecap:round; stroke-linejoin:round}
+    .wk-subrow.done .wk-subcheck{background:var(--accent2); border-color:var(--accent2)}
+    .wk-subrow.done .wk-subcheck svg{opacity:1}
+    .wk-subtitle{font-size:14px; font-weight:600; line-height:1.35; overflow-wrap:anywhere; flex:1}
+    .wk-subrow.done .wk-subtitle{text-decoration:line-through; color:var(--dim); font-weight:500}
+    .wk-subadd{display:flex; gap:6px; margin-top:6px}
+    .wk-subadd input{margin-top:0; padding:8px 11px; font-size:14px; border-radius:10px; flex:1; min-width:0}
+    .wk-subadd button{background:var(--card2); border:1px solid var(--line); color:var(--accent); border-radius:10px; padding:0 12px; font-weight:800; font-size:13px}
+    .wk-erow{display:flex; gap:6px; margin-bottom:6px; align-items:center}
+    .wk-erow input{margin-top:0; padding:9px 11px; font-size:14px; flex:1; min-width:0}
+    .wk-erow button{background:var(--card2); border:1px solid var(--line); color:#e5736b; border-radius:10px; height:40px; padding:0 11px; font-size:15px}
+    .wk-eadd{width:100%; background:none; border:1px dashed var(--line); color:var(--accent); padding:10px; border-radius:12px; font-weight:700; font-size:13px; margin-top:2px}
+    .wk-elabel{display:block; font-size:11px; color:var(--dim); font-weight:800; text-transform:uppercase; letter-spacing:.5px; margin:12px 0 6px}
     .wk-tiles{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px}
     .wk-tile{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:14px; box-shadow:var(--shadow); min-width:0}
     .wk-tile .l{font-size:11px; color:var(--dim); font-weight:800; text-transform:uppercase; letter-spacing:.6px}
@@ -473,6 +493,9 @@
       <div><label for="wk_e_due">Due</label><input id="wk_e_due" type="date"></div>
       <div><label for="wk_e_est">Estimate (min)</label><input id="wk_e_est" type="number" min="1"></div>
     </div>
+    <label class="wk-elabel" for="wk_e_subs">Steps</label>
+    <div id="wk_e_subs"></div>
+    <button class="wk-eadd" type="button" id="wk_e_addsub"><i class="ph ph-plus"></i> add a step</button>
     <div class="wk-dfoot">
       <button class="wk-btn danger" type="button" id="wk_e_delete"><i class="ph ph-trash"></i> Delete</button>
       <div class="r"><button class="wk-btn" type="button" id="wk_e_cancel">Cancel</button><button class="wk-btn primary" type="submit">Save</button></div>
@@ -926,6 +949,8 @@ const fmtHours = h => h == null ? '–' : h < 1 ? Math.round(h*60)+' min' : h < 
 const PRI = { high:0, medium:1, low:2 };
 
 let view = 'tasks', filter = 'open', cat = '', editing = null;
+const expanded = new Set();                                   // task ids showing their steps
+const subs = t => Array.isArray(t.subtasks) ? t.subtasks : [];
 try{ if(localStorage.getItem('wk.view') === 'progress') view = 'progress';
      const f = localStorage.getItem('wk.filter'); if(['open','today','upcoming','done'].includes(f)) filter = f; }catch(e){}
 
@@ -1047,18 +1072,54 @@ function renderList(){
           ${dueChip(x)}
           ${x.estimate ? `<span class="plain">${fmtMin(x.estimate)}</span>` : ''}
           ${x.done && x.completedAt ? `<span class="plain">Done ${esc(fmtDay(dayKey(x.completedAt)))}</span>` : ''}
+          ${stepsChip(x)}
         </div>
+        ${subs(x).length && !expanded.has(x.id) ? `<div class="wk-subbar"><i style="width:${subs(x).filter(s => s.done).length / subs(x).length * 100}%"></i></div>` : ''}
+        ${renderSubs(x)}
       </div>
     </div>`).join('');
+}
+function stepsChip(x){
+  const ss = subs(x), open = expanded.has(x.id);
+  if(ss.length) return `<button type="button" class="steps" data-act="toggle" aria-expanded="${open}">${ss.filter(s => s.done).length}/${ss.length} steps <i class="ph ph-caret-${open ? 'up' : 'down'}"></i></button>`;
+  return x.done ? '' : `<button type="button" class="steps" data-act="toggle" aria-expanded="${open}"><i class="ph ph-plus"></i>steps</button>`;
+}
+function renderSubs(x){
+  if(!expanded.has(x.id)) return '';
+  return `<div class="wk-sub">
+    ${subs(x).map(s => `<div class="wk-subrow${s.done ? ' done' : ''}" data-sid="${esc(s.id)}">
+      <button type="button" class="wk-subcheck" aria-label="${s.done ? 'Mark step as not done' : 'Mark step done'}" aria-pressed="${!!s.done}"><svg viewBox="0 0 16 16"><path d="M3 8.5l3.2 3L13 4.5"/></svg></button>
+      <span class="wk-subtitle">${esc(s.title)}</span>
+    </div>`).join('')}
+    <form class="wk-subadd" autocomplete="off"><input placeholder="Add a step" aria-label="New step" maxlength="200"><button type="submit">Add</button></form>
+  </div>`;
 }
 q('#wkList').addEventListener('click', e => {
   const row = e.target.closest('.wk-task'); if(!row) return;
   const t = W().tasks.find(x => x.id === row.dataset.id); if(!t) return;
   if(e.target.closest('.wk-check')){
-    const done = !t.done;
-    upsert({ ...t, done, completedAt: done ? new Date().toISOString() : null });
+    const done = !t.done, now = new Date().toISOString();
+    const subtasks = done ? subs(t).map(s => s.done ? s : { ...s, done: true, doneAt: now }) : subs(t);
+    upsert({ ...t, done, completedAt: done ? now : null, subtasks });
     if(done) toast('Done. Nice one.');
+  } else if(e.target.closest('[data-act="toggle"]')){
+    if(expanded.has(t.id)) expanded.delete(t.id); else expanded.add(t.id);
+    renderList();
+    if(expanded.has(t.id)){ const inp = q(`.wk-task[data-id="${t.id}"] .wk-subadd input`); if(inp && !subs(t).length) inp.focus(); }
+  } else if(e.target.closest('.wk-subcheck')){
+    const sid = e.target.closest('.wk-subrow').dataset.sid;
+    const subtasks = subs(t).map(s => s.id === sid ? { ...s, done: !s.done, doneAt: !s.done ? new Date().toISOString() : null } : s);
+    upsert({ ...t, subtasks });
+    if(!t.done && subtasks.length && subtasks.every(s => s.done)) toast('All steps done \u2014 tick the task when you\u2019re ready');
   } else if(e.target.closest('.wk-title')) openEditor(t);
+});
+q('#wkList').addEventListener('submit', e => {
+  const form = e.target.closest('.wk-subadd'); if(!form) return;
+  e.preventDefault();
+  const row = form.closest('.wk-task'), t = W().tasks.find(x => x.id === row.dataset.id); if(!t) return;
+  const title = form.querySelector('input').value.trim(); if(!title) return;
+  upsert({ ...t, subtasks: [...subs(t), { id: uid(), title, done: false, doneAt: null }] });
+  const inp = q(`.wk-task[data-id="${t.id}"] .wk-subadd input`); if(inp) inp.focus();
 });
 
 /* ----- editor ----- */
@@ -1066,14 +1127,28 @@ function openEditor(t){
   editing = t;
   q('#wk_e_title').value = t.title; q('#wk_e_cat').value = t.category || ''; q('#wk_e_pri').value = t.priority || 'medium';
   q('#wk_e_due').value = t.due || ''; q('#wk_e_est').value = t.estimate || '';
+  q('#wk_e_subs').innerHTML = '';
+  subs(t).forEach(s => addEditRow(s));
   q('#wkEditor').showModal();
 }
+function addEditRow(s){
+  const row = document.createElement('div'); row.className = 'wk-erow';
+  row.dataset.sid = s && s.id ? s.id : ''; row.dataset.done = s && s.done ? '1' : ''; row.dataset.doneAt = s && s.doneAt ? s.doneAt : '';
+  row.innerHTML = `<input aria-label="Step" maxlength="200" placeholder="e.g. Collect last month's figures"><button type="button" aria-label="Remove step"><i class="ph ph-x"></i></button>`;
+  row.querySelector('input').value = s && s.title ? s.title : '';
+  row.querySelector('button').addEventListener('click', () => row.remove());
+  q('#wk_e_subs').appendChild(row);
+  return row;
+}
+q('#wk_e_addsub').addEventListener('click', () => addEditRow(null).querySelector('input').focus());
 q('#wk_e_cancel').addEventListener('click', () => q('#wkEditor').close());
 q('#wkEditForm').addEventListener('submit', e => {
   e.preventDefault(); if(!editing) return;
   const title = q('#wk_e_title').value.trim(); if(!title) return;
   const est = parseInt(q('#wk_e_est').value, 10);
-  upsert({ ...editing, title, category: q('#wk_e_cat').value.trim(), priority: q('#wk_e_pri').value, due: q('#wk_e_due').value || null, estimate: est > 0 ? est : null });
+  const subtasks = [...document.querySelectorAll('#wk_e_subs .wk-erow')].map(r => ({
+    id: r.dataset.sid || uid(), title: r.querySelector('input').value.trim(), done: !!r.dataset.done, doneAt: r.dataset.doneAt || null })).filter(x => x.title);
+  upsert({ ...editing, title, category: q('#wk_e_cat').value.trim(), priority: q('#wk_e_pri').value, due: q('#wk_e_due').value || null, estimate: est > 0 ? est : null, subtasks });
   q('#wkEditor').close();
 });
 q('#wk_e_delete').addEventListener('click', () => {
@@ -1102,13 +1177,15 @@ function analytics(){
   const minutesOpen = open.reduce((a, t) => a + (t.estimate || 0), 0);
   const highOpen = open.filter(t => t.priority === 'high').length;
   const first = tasks.length ? tasks.map(t => t.createdAt).sort()[0] : null;
-  return { done, open, todayCount, streak, thisWeek, lastWeek, withDue, onTime, avgCycle, days, wd, cats, overdue, minutesThisWeek, minutesOpen, highOpen, first, activeDays: Object.keys(byDay).length };
+  let stepsDone = 0, stepsToday = 0, stepsOpen = 0;
+  tasks.forEach(t => subs(t).forEach(s => { if(s.done){ stepsDone++; if(s.doneAt && dayKey(s.doneAt) === tk) stepsToday++; } else if(!t.done) stepsOpen++; }));
+  return { stepsDone, stepsToday, stepsOpen, done, open, todayCount, streak, thisWeek, lastWeek, withDue, onTime, avgCycle, days, wd, cats, overdue, minutesThisWeek, minutesOpen, highOpen, first, activeDays: Object.keys(byDay).length };
 }
 function renderProgress(){
   const a = analytics(), delta = a.thisWeek.length - a.lastWeek.length;
   const onTimePct = a.withDue.length ? Math.round(a.onTime.length / a.withDue.length * 100) : null;
   q('#wkTiles').innerHTML = `
-    <div class="wk-tile"><div class="l">Done today</div><div class="v">${a.todayCount}</div><div class="s">${a.open.length} still open</div></div>
+    <div class="wk-tile"><div class="l">Done today</div><div class="v">${a.todayCount}</div><div class="s">${a.open.length} still open${a.stepsToday ? ' \u00b7 ' + a.stepsToday + (a.stepsToday === 1 ? ' step' : ' steps') + ' ticked' : ''}</div></div>
     <div class="wk-tile"><div class="l">Streak</div><div class="v">${a.streak}<small>${a.streak === 1 ? 'day' : 'days'}</small></div><div class="s">${a.streak && !a.todayCount ? 'Finish one today to keep it' : a.streak ? 'Days in a row with a task done' : 'Finish a task to start one'}</div></div>
     <div class="wk-tile"><div class="l">This week</div><div class="v">${a.thisWeek.length}</div><div class="s ${delta > 0 ? 'up' : delta < 0 ? 'down' : ''}">${delta > 0 ? '▲ ' + delta + ' vs' : delta < 0 ? '▼ ' + Math.abs(delta) + ' vs' : 'Same as'} last week (${a.lastWeek.length})</div></div>
     <div class="wk-tile"><div class="l">On time</div><div class="v">${onTimePct == null ? '–' : onTimePct + '<small>%</small>'}</div><div class="s">${a.withDue.length ? a.onTime.length + ' of ' + a.withDue.length + ' dated tasks' : 'No dated tasks finished yet'}</div></div>`;
@@ -1126,6 +1203,7 @@ function renderProgress(){
     fig('Average time to finish', fmtHours(a.avgCycle), 'from adding a task to ticking it off') +
     fig('Planned work cleared this week', a.minutesThisWeek ? fmtMin(a.minutesThisWeek) : '–', 'estimates on tasks done this week') +
     fig('Planned work still open', a.minutesOpen ? fmtMin(a.minutesOpen) : '–', 'estimates on open tasks') +
+    fig('Steps ticked off', a.stepsDone, a.stepsOpen ? a.stepsOpen + ' still open inside tasks' : 'inside tasks, all time') +
     fig('Active days', a.activeDays, 'days with at least one task done');
 }
 function tipFor(c){ let t = c.querySelector('.wk-tip'); if(!t){ t = document.createElement('div'); t.className = 'wk-tip'; c.appendChild(t); } return t; }
