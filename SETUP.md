@@ -62,3 +62,13 @@ One-time, ~10 minutes. You click through the console; the code is already writte
 
 ## Free-tier headroom
 Firestore free (Spark) plan: 1 GB stored, 50K reads + 20K writes/day. A single person's task app uses a rounding error of that. Cost: **$0**.
+
+---
+
+## C. Work tab (to-do + progress analytics)
+
+Home → **Work**. A separate list for your main job: tasks with category, priority, due date and a time estimate, ticked off as you go. The **Progress** view shows done-today, streak, this week vs last, on-time rate, a 30-day chart, your average by weekday, a category breakdown and the running numbers.
+
+- Work tasks live in `work: { goal, tasks[] }` inside the same `users/{uid}` document, so they sync laptop ↔ phone with no extra setup.
+- They are deliberately invisible to **"I'm stuck — give me one"** and to the bifurcate automation, which only read `tasks[]`.
+- `apply.js` updates only the `tasks` field, so it never touches work data.

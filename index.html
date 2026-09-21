@@ -171,6 +171,99 @@
     .back{background:none; color:var(--accent); font-size:14px; font-weight:600; margin-bottom:8px}
     .toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:var(--accent2); color:#fff; padding:11px 18px; border-radius:999px; font-weight:700; font-size:14px; box-shadow:0 6px 20px rgba(42,163,146,.4); opacity:0; transition:opacity .25s; pointer-events:none}
     .toast.show{opacity:1}
+
+    /* ============ WORK — to-do + progress tracker ============ */
+    .wk-goal{background:none; padding:0; text-align:left; font-family:'Baloo 2','Nunito',sans-serif; font-weight:700; font-size:21px; line-height:1.25; color:var(--txt); margin:2px 0 14px; width:100%}
+    .wk-goal.empty{color:var(--dim)}
+    .wk-goal i{font-size:15px; color:var(--dim); margin-left:6px; vertical-align:-1px}
+    .wk-goalInput{font-family:'Baloo 2','Nunito',sans-serif; font-weight:700; font-size:20px; margin:0 0 14px; padding:9px 12px}
+    .wk-tabs{display:grid; grid-template-columns:1fr 1fr; gap:4px; background:var(--card2); border:1px solid var(--line); padding:4px; border-radius:14px; margin:0 0 14px}
+    .wk-tab{background:transparent; border-radius:10px; padding:10px; font-weight:700; color:var(--dim); font-size:14px}
+    .wk-tab.on{background:var(--card); color:var(--accent); box-shadow:var(--shadow)}
+    .wk-tab i{margin-right:5px; font-size:15px; vertical-align:-2px}
+    .wk-composer{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:12px; box-shadow:var(--shadow); margin-bottom:14px}
+    .wk-row{display:flex; gap:8px}
+    .wk-row input{margin-top:0; flex:1; min-width:0; font-size:16px}
+    .wk-addBtn{background:var(--accent); color:#fff; border-radius:12px; padding:0 16px; font-weight:800; font-size:15px; flex:0 0 auto}
+    .wk-opts{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px; padding-top:12px; border-top:1px dashed var(--line)}
+    .wk-opts label{font-size:11px; color:var(--dim); font-weight:800; text-transform:uppercase; letter-spacing:.5px}
+    .wk-opts input,.wk-opts select{margin-top:4px; padding:10px 12px; font-size:14px}
+    .wk-more{background:none; color:var(--accent); font-weight:700; font-size:13px; padding:10px 0 0; display:flex; align-items:center; gap:5px}
+    .wk-more i{font-size:15px}
+    .wk-filters{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; align-items:center}
+    .wk-filters .chip{padding:7px 12px; font-size:13px}
+    .wk-filters .chip .n{opacity:.75; margin-left:4px; font-variant-numeric:tabular-nums}
+    .wk-filters select{width:auto; margin:0 0 0 auto; padding:7px 10px; font-size:13px; border-radius:999px; color:var(--dim); font-weight:600; max-width:48%}
+    .wk-task{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:12px 12px 12px 15px; margin-bottom:8px; display:flex; gap:12px; align-items:flex-start; box-shadow:var(--shadow); position:relative; overflow:hidden}
+    .wk-task::before{content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:transparent}
+    .wk-task[data-p="high"]::before{background:var(--coral)}
+    .wk-task[data-p="medium"]::before{background:#f2b64b}
+    .wk-check{width:26px; height:26px; border-radius:50%; border:2px solid var(--line); background:var(--card2); flex:0 0 auto; margin-top:1px; display:grid; place-items:center; padding:0}
+    .wk-check svg{width:14px; height:14px; opacity:0; stroke:#fff; fill:none; stroke-width:3; stroke-linecap:round; stroke-linejoin:round}
+    .wk-task.done .wk-check{background:var(--accent2); border-color:var(--accent2)}
+    .wk-task.done .wk-check svg{opacity:1}
+    .wk-body{min-width:0; flex:1}
+    .wk-title{background:none; padding:0; text-align:left; font-weight:700; font-size:15px; line-height:1.35; width:100%; overflow-wrap:anywhere; color:var(--txt)}
+    .wk-task.done .wk-title{text-decoration:line-through; color:var(--dim); font-weight:600}
+    .wk-meta{display:flex; flex-wrap:wrap; gap:5px; margin-top:6px; font-size:12px; color:var(--dim)}
+    .wk-meta span{background:var(--card2); border:1px solid var(--line); padding:2px 8px; border-radius:999px; font-weight:600}
+    .wk-meta .cat{background:#e3f3ef; border-color:#cfe9e2; color:var(--accent)}
+    .wk-meta .over{background:#ffe9e0; border-color:#ffd3c2; color:#d2694a}
+    .wk-meta .today{background:var(--accent2); border-color:var(--accent2); color:#fff}
+    .wk-meta .plain{background:none; border-color:transparent; padding-inline:0}
+    .wk-empty{color:var(--dim); text-align:center; padding:30px 10px; font-size:14px; background:var(--card); border:1px solid var(--line); border-radius:16px}
+    .wk-empty b{display:block; color:var(--txt); font-size:16px; margin-bottom:3px}
+    .wk-tiles{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px}
+    .wk-tile{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:14px; box-shadow:var(--shadow); min-width:0}
+    .wk-tile .l{font-size:11px; color:var(--dim); font-weight:800; text-transform:uppercase; letter-spacing:.6px}
+    .wk-tile .v{font-family:'Baloo 2','Nunito',sans-serif; font-weight:800; font-size:34px; line-height:1.1; margin:4px 0 2px; color:var(--accent)}
+    .wk-tile .v small{font-size:14px; color:var(--dim); margin-left:3px; font-family:'Nunito',sans-serif; font-weight:700}
+    .wk-tile .s{font-size:12px; color:var(--dim); font-weight:600}
+    .wk-tile .s.up{color:var(--accent2)}
+    .wk-tile .s.down{color:#d2694a}
+    .wk-panel{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:16px; margin-bottom:12px; box-shadow:var(--shadow); min-width:0}
+    .wk-panel h2{font-size:16px; margin:0; font-weight:800}
+    .wk-ph{display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:10px}
+    .wk-ph p{margin:0; font-size:12px; color:var(--dim); font-weight:600}
+    .wk-chart{position:relative; width:100%}
+    .wk-chart svg{display:block; width:100%; height:auto; overflow:visible}
+    .wk-chart text{font-family:'Nunito',sans-serif; font-size:11px; fill:var(--dim); font-weight:700}
+    .wk-chart .lv{fill:var(--txt)}
+    .wk-chart .hit{fill:transparent}
+    .wk-tip{position:absolute; pointer-events:none; background:var(--txt); color:#fff; font-size:12px; font-weight:600; padding:5px 8px; border-radius:8px; white-space:nowrap; transform:translate(-50%,-100%); margin-top:-8px; opacity:0; transition:opacity .1s}
+    .wk-tip.on{opacity:1}
+    .wk-tbl{margin-top:8px}
+    .wk-tbl summary{font-size:13px; color:var(--accent); font-weight:700; cursor:pointer}
+    .wk-tbl table{border-collapse:collapse; width:100%; font-size:13px; margin-top:6px}
+    .wk-tbl th,.wk-tbl td{text-align:left; padding:5px 6px; border-bottom:1px solid var(--line)}
+    .wk-tbl th{font-size:11px; text-transform:uppercase; letter-spacing:.5px; color:var(--dim)}
+    .wk-tbl .n{text-align:right}
+    .wk-cats{display:grid; grid-template-columns:auto 1fr auto; gap:8px 10px; align-items:center; font-size:13px}
+    .wk-cats .name{font-weight:700; max-width:110px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+    .wk-cats .bar{height:14px; display:flex; gap:2px}
+    .wk-cats .bar i{display:block; height:100%; border-radius:3px}
+    .wk-cats .bar .d{background:var(--accent2)}
+    .wk-cats .bar .o{background:var(--line)}
+    .wk-cats .nums{color:var(--dim); font-weight:600; white-space:nowrap; font-size:12px}
+    .wk-legend{display:flex; gap:14px; font-size:12px; color:var(--dim); font-weight:600; margin-top:12px}
+    .wk-legend i{display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:5px; vertical-align:-1px}
+    .wk-figs{display:grid; grid-template-columns:1fr auto; margin:0}
+    .wk-figs div{display:contents}
+    .wk-figs dt{padding:9px 0; border-bottom:1px solid var(--line); color:var(--txt); font-weight:600; font-size:14px}
+    .wk-figs dt small{display:block; font-size:12px; color:var(--dim); font-weight:600}
+    .wk-figs dd{margin:0; padding:9px 0 9px 12px; border-bottom:1px solid var(--line); font-weight:800; text-align:right; color:var(--accent); font-size:15px; white-space:nowrap}
+    .wk-figs div:last-child dt,.wk-figs div:last-child dd{border-bottom:0}
+    #wkEditor{border:0; border-radius:20px; padding:0; background:var(--card); color:var(--txt); box-shadow:var(--shadow); width:min(460px,calc(100vw - 28px)); max-width:none}
+    #wkEditor::backdrop{background:rgba(52,66,61,.45)}
+    #wkEditor form{padding:18px}
+    #wkEditor h2{font-size:18px; margin:0 0 10px; font-weight:800}
+    #wkEditor .wk-opts{border-top:0; padding-top:0}
+    .wk-dfoot{display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:16px}
+    .wk-dfoot .r{display:flex; gap:8px}
+    .wk-btn{background:var(--card2); border:1px solid var(--line); color:var(--txt); padding:11px 16px; border-radius:12px; font-weight:700; font-size:14px}
+    .wk-btn.primary{background:var(--accent); border-color:var(--accent); color:#fff}
+    .wk-btn.danger{background:none; border-color:transparent; color:#e5736b}
+    @media (prefers-reduced-motion:reduce){ .wk-tip,.wk-check{transition:none} }
   </style>
 </head>
 <body>
@@ -216,6 +309,7 @@
     <div class="links">
       <button onclick="openForm()"><i class="ph ph-plus-circle"></i>Add task</button>
       <button onclick="renderList(); show('list')"><i class="ph ph-list-bullets"></i>Browse</button>
+      <button onclick="openWork()"><i class="ph ph-briefcase"></i>Work</button>
     </div>
     <div class="stat" id="stat"></div>
     <div class="stat" id="syncBar" style="margin-top:10px"></div>
@@ -295,6 +389,66 @@
     <div id="listBody"></div>
   </section>
 
+  <!-- ============ WORK — to-do + progress tracker (synced with everything else) ============ -->
+  <section id="work" class="hidden">
+    <button class="back" onclick="show('home')"><i class="ph ph-arrow-left"></i>back</button>
+    <h1>Work</h1>
+    <button class="wk-goal empty" id="wkGoal" title="Tap to set the one goal this tracks">What are you working towards? <i class="ph ph-pencil-simple"></i></button>
+
+    <div class="wk-tabs" role="tablist" aria-label="Work views">
+      <button class="wk-tab on" id="wkTabTasks" role="tab" aria-selected="true" onclick="wkView('tasks')"><i class="ph ph-check-square"></i>Tasks</button>
+      <button class="wk-tab" id="wkTabProgress" role="tab" aria-selected="false" onclick="wkView('progress')"><i class="ph ph-chart-bar"></i>Progress</button>
+    </div>
+
+    <div id="wkTasks">
+      <form class="wk-composer" id="wkComposer" autocomplete="off">
+        <div class="wk-row">
+          <input id="wk_title" placeholder="Add a work task" aria-label="Task title" required>
+          <button class="wk-addBtn" type="submit">Add</button>
+        </div>
+        <div class="wk-opts hidden" id="wkOpts">
+          <div><label for="wk_cat">Category</label><input id="wk_cat" list="wkCats" placeholder="e.g. Reports"></div>
+          <div><label for="wk_pri">Priority</label><select id="wk_pri"><option value="medium">Medium</option><option value="high">High</option><option value="low">Low</option></select></div>
+          <div><label for="wk_due">Due</label><input id="wk_due" type="date"></div>
+          <div><label for="wk_est">Estimate (min)</label><input id="wk_est" type="number" min="1" placeholder="30"></div>
+        </div>
+        <button class="wk-more" type="button" id="wkMore" aria-expanded="false"><i class="ph ph-caret-down" id="wkMoreCaret"></i>Category, priority, due date, estimate</button>
+        <datalist id="wkCats"></datalist>
+      </form>
+
+      <div class="wk-filters" id="wkFilters">
+        <button type="button" class="chip on" data-f="open">Open<span class="n" id="wkNOpen"></span></button>
+        <button type="button" class="chip" data-f="today">Due today<span class="n" id="wkNToday"></span></button>
+        <button type="button" class="chip" data-f="upcoming">Upcoming<span class="n" id="wkNUpcoming"></span></button>
+        <button type="button" class="chip" data-f="done">Done<span class="n" id="wkNDone"></span></button>
+        <select id="wkCatFilter" aria-label="Filter by category"><option value="">All categories</option></select>
+      </div>
+      <div id="wkList"></div>
+    </div>
+
+    <div id="wkProgress" class="hidden">
+      <div class="wk-tiles" id="wkTiles"></div>
+      <div class="wk-panel">
+        <div class="wk-ph"><h2>Tasks done per day</h2><p>Last 30 days</p></div>
+        <div class="wk-chart" id="wkChartDays"></div>
+        <details class="wk-tbl"><summary>Show as table</summary><div id="wkTblDays"></div></details>
+      </div>
+      <div class="wk-panel">
+        <div class="wk-ph"><h2>Your working week</h2><p>Avg done per weekday, last 8 weeks</p></div>
+        <div class="wk-chart" id="wkChartWeek"></div>
+      </div>
+      <div class="wk-panel">
+        <div class="wk-ph"><h2>By category</h2><p>Done and still open</p></div>
+        <div class="wk-cats" id="wkCatsChart"></div>
+        <div class="wk-legend"><span><i style="background:var(--accent2)"></i>Done</span><span><i style="background:var(--line)"></i>Open</span></div>
+      </div>
+      <div class="wk-panel">
+        <div class="wk-ph"><h2>The numbers</h2><p>All time unless noted</p></div>
+        <dl class="wk-figs" id="wkFigs"></dl>
+      </div>
+    </div>
+  </section>
+
 </div>
 
 <!-- peak-end celebration (shown briefly on Done) -->
@@ -308,6 +462,24 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- work task editor -->
+<dialog id="wkEditor">
+  <form method="dialog" id="wkEditForm">
+    <h2>Edit task</h2>
+    <input id="wk_e_title" aria-label="Task title" required style="margin-top:0">
+    <div class="wk-opts">
+      <div><label for="wk_e_cat">Category</label><input id="wk_e_cat" list="wkCats"></div>
+      <div><label for="wk_e_pri">Priority</label><select id="wk_e_pri"><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select></div>
+      <div><label for="wk_e_due">Due</label><input id="wk_e_due" type="date"></div>
+      <div><label for="wk_e_est">Estimate (min)</label><input id="wk_e_est" type="number" min="1"></div>
+    </div>
+    <div class="wk-dfoot">
+      <button class="wk-btn danger" type="button" id="wk_e_delete"><i class="ph ph-trash"></i> Delete</button>
+      <div class="r"><button class="wk-btn" type="button" id="wk_e_cancel">Cancel</button><button class="wk-btn primary" type="submit">Save</button></div>
+    </div>
+  </form>
+</dialog>
+
 <script>
 const KEY='momentum.v1';
 let state = load();
@@ -316,11 +488,12 @@ let filterMin = 0, mood = null;
 let pendingNext = null;                 // a paired follow-on task queued after Done
 const RING_C = 327;   // circumference of the r=52 timer ring
 
+function normWork(w){ w = w || {}; return { goal: typeof w.goal === 'string' ? w.goal : '', tasks: Array.isArray(w.tasks) ? w.tasks : [] }; }
 function load(){
   try{
     const d = JSON.parse(localStorage.getItem(KEY)) || {};
-    return { tasks:d.tasks||[], log:d.log||[], settings:Object.assign({muted:false, tick:false}, d.settings||{}) };
-  }catch(e){ return {tasks:[], log:[], settings:{muted:false, tick:false}}; }
+    return { tasks:d.tasks||[], log:d.log||[], work:normWork(d.work), settings:Object.assign({muted:false, tick:false}, d.settings||{}) };
+  }catch(e){ return {tasks:[], log:[], work:normWork(null), settings:{muted:false, tick:false}}; }
 }
 function saveLocalOnly(){ localStorage.setItem(KEY, JSON.stringify(state)); }
 function save(){ saveLocalOnly(); if(window.__syncPush) window.__syncPush(); }
@@ -338,7 +511,7 @@ function currentStep(t){
 }
 
 function show(id){
-  ['home','serve','form','list'].forEach(s=>document.getElementById(s).classList.add('hidden'));
+  ['home','serve','form','list','work'].forEach(s=>document.getElementById(s).classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
   if(id==='home'){ renderStat(); renderNextUp(); }
   window.scrollTo(0,0);
@@ -694,6 +867,7 @@ function rerenderCurrent(){
   renderStat();
   renderNextUp();
   if(!document.getElementById('list').classList.contains('hidden')) renderList();
+  if(!document.getElementById('work').classList.contains('hidden') && window.renderWork) renderWork();
   if(!document.getElementById('serve').classList.contains('hidden')){
     // don't rebuild the serve card while a timer is live — that replays the
     // entrance animation and looks like a double-refresh. Let the running
@@ -701,8 +875,8 @@ function rerenderCurrent(){
     if(!timer){ const t=state.tasks.find(x=>x.id===currentId); if(t) renderServe(t); }
   }
 }
-window.__syncGetData = ()=>({tasks:state.tasks, log:state.log});
-window.__applyRemote = (data)=>{ state.tasks=data.tasks||[]; state.log=data.log||[]; saveLocalOnly(); rerenderCurrent(); };
+window.__syncGetData = ()=>({tasks:state.tasks, log:state.log, work:state.work});
+window.__applyRemote = (data)=>{ state.tasks=data.tasks||[]; state.log=data.log||[]; state.work=normWork(data.work); saveLocalOnly(); rerenderCurrent(); };
 window.__setSyncStatus = (html)=>{ const b=document.getElementById('syncBar'); if(b) b.innerHTML=html; };
 
 renderStat();
@@ -731,6 +905,290 @@ if('serviceWorker' in navigator){
 }
 </script>
 
+<!-- ============ WORK — to-do + progress analytics. Lives in state.work = {goal, tasks},
+     synced inside the same users/{uid} doc. Never touched by "give me one" or the bifurcate job. ============ -->
+<script>
+(function(){
+const q = s => document.querySelector(s);
+const pad2 = n => String(n).padStart(2,'0');
+const dayKey = d => { const x = d instanceof Date ? d : new Date(d); return x.getFullYear()+'-'+pad2(x.getMonth()+1)+'-'+pad2(x.getDate()); };
+const fromKey = k => { const [y,m,d] = k.split('-').map(Number); return new Date(y, m-1, d); };
+const addDays = (k, n) => { const x = fromKey(k); x.setDate(x.getDate()+n); return dayKey(x); };
+const today = () => dayKey(new Date());
+const dowMon = k => (fromKey(k).getDay()+6)%7;             // 0 = Monday
+const weekStart = k => addDays(k, -dowMon(k));
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const fmtDay = k => { const d = fromKey(k); return DAYS[dowMon(k)]+' '+d.getDate()+' '+MONTHS[d.getMonth()]; };
+const fmtShort = k => { const d = fromKey(k); return d.getDate()+' '+MONTHS[d.getMonth()]; };
+const fmtMin = m => { if(!m) return ''; const h = Math.floor(m/60), r = m%60; return h ? (r ? h+'h '+r+'m' : h+'h') : m+'m'; };
+const fmtHours = h => h == null ? '–' : h < 1 ? Math.round(h*60)+' min' : h < 48 ? (Math.round(h*10)/10)+' h' : (Math.round(h/24*10)/10)+' days';
+const PRI = { high:0, medium:1, low:2 };
+
+let view = 'tasks', filter = 'open', cat = '', editing = null;
+try{ if(localStorage.getItem('wk.view') === 'progress') view = 'progress';
+     const f = localStorage.getItem('wk.filter'); if(['open','today','upcoming','done'].includes(f)) filter = f; }catch(e){}
+
+const W = () => state.work;
+function commit(){ save(); renderWork(); }
+function upsert(t){ const ts = W().tasks; const i = ts.findIndex(x => x.id === t.id); if(i >= 0) ts[i] = t; else ts.push(t); commit(); }
+function remove(id){ W().tasks = W().tasks.filter(x => x.id !== id); commit(); }
+
+/* ----- entry points used by the rest of the app ----- */
+window.openWork = function(){ show('work'); renderWork(); };
+window.wkView = function(v){ view = v; try{ localStorage.setItem('wk.view', v); }catch(e){} renderWork(); };
+window.renderWork = function(){
+  renderGoal();
+  q('#wkTabTasks').classList.toggle('on', view === 'tasks'); q('#wkTabTasks').setAttribute('aria-selected', String(view === 'tasks'));
+  q('#wkTabProgress').classList.toggle('on', view === 'progress'); q('#wkTabProgress').setAttribute('aria-selected', String(view === 'progress'));
+  q('#wkTasks').classList.toggle('hidden', view !== 'tasks');
+  q('#wkProgress').classList.toggle('hidden', view !== 'progress');
+  if(view === 'tasks') renderList(); else renderProgress();
+};
+
+/* ----- goal line ----- */
+function renderGoal(){
+  const g = (W().goal || '').trim(), b = q('#wkGoal');
+  b.innerHTML = (g ? esc(g) : 'What are you working towards?') + ' <i class="ph ph-pencil-simple"></i>';
+  b.classList.toggle('empty', !g);
+}
+q('#wkGoal').addEventListener('click', () => {
+  const b = q('#wkGoal'), input = document.createElement('input');
+  input.className = 'wk-goalInput'; input.id = 'wkGoalInput'; input.value = W().goal || ''; input.maxLength = 120;
+  input.placeholder = 'e.g. Ship the district health dashboard'; input.setAttribute('aria-label', 'Your goal');
+  b.classList.add('hidden'); b.insertAdjacentElement('afterend', input); input.focus();
+  let done = false;
+  const finish = ok => { if(done) return; done = true; const v = input.value.trim(); input.remove(); b.classList.remove('hidden');
+    if(ok && v !== (W().goal || '')){ W().goal = v; commit(); } else renderGoal(); };
+  input.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); finish(true); } if(e.key === 'Escape') finish(false); });
+  input.addEventListener('blur', () => finish(true));
+});
+
+/* ----- composer ----- */
+q('#wkMore').addEventListener('click', e => {
+  const open = q('#wkOpts').classList.contains('hidden');
+  q('#wkOpts').classList.toggle('hidden', !open);
+  e.currentTarget.setAttribute('aria-expanded', String(open));
+  q('#wkMoreCaret').className = open ? 'ph ph-caret-up' : 'ph ph-caret-down';
+});
+q('#wkComposer').addEventListener('submit', e => {
+  e.preventDefault();
+  const title = q('#wk_title').value.trim(); if(!title){ toast('Give it a title'); return; }
+  const est = parseInt(q('#wk_est').value, 10);
+  const t = { id: uid(), title, category: q('#wk_cat').value.trim(), priority: q('#wk_pri').value, due: q('#wk_due').value || null,
+    estimate: est > 0 ? est : null, done: false, createdAt: new Date().toISOString(), completedAt: null };
+  const tk = today();
+  if(filter === 'done' || (filter === 'today' && !(t.due && t.due <= tk)) || (filter === 'upcoming' && t.due && t.due <= tk)) setFilter('open');
+  upsert(t);
+  q('#wk_title').value = ''; q('#wk_est').value = ''; q('#wk_title').focus();
+  toast('Added');
+});
+
+/* ----- filters ----- */
+function setFilter(f){ filter = f; try{ localStorage.setItem('wk.filter', f); }catch(e){} }
+q('#wkFilters').addEventListener('click', e => { const b = e.target.closest('.chip'); if(b){ setFilter(b.dataset.f); renderList(); } });
+q('#wkCatFilter').addEventListener('change', e => { cat = e.target.value; renderList(); });
+
+/* ----- list ----- */
+function sortOpen(a, b){
+  const tk = today(), ao = !!(a.due && a.due < tk), bo = !!(b.due && b.due < tk);
+  if(ao !== bo) return ao ? -1 : 1;
+  if((a.due || '') !== (b.due || '')){ if(!a.due) return 1; if(!b.due) return -1; return a.due < b.due ? -1 : 1; }
+  if(PRI[a.priority] !== PRI[b.priority]) return PRI[a.priority] - PRI[b.priority];
+  return a.createdAt < b.createdAt ? -1 : 1;
+}
+function visible(){
+  const tk = today();
+  let ts = W().tasks.filter(x => !cat || (x.category || '') === cat);
+  switch(filter){
+    case 'today': ts = ts.filter(x => !x.done && x.due && x.due <= tk); break;
+    case 'upcoming': ts = ts.filter(x => !x.done && (!x.due || x.due > tk)); break;
+    case 'done': ts = ts.filter(x => x.done); break;
+    default: ts = ts.filter(x => !x.done);
+  }
+  return filter === 'done' ? ts.sort((a, b) => (b.completedAt || '') < (a.completedAt || '') ? -1 : 1) : ts.sort(sortOpen);
+}
+function dueChip(t){
+  if(!t.due || t.done) return '';
+  const tk = today();
+  if(t.due < tk){ const n = Math.round((fromKey(tk) - fromKey(t.due))/864e5); return `<span class="over">Overdue ${n}d</span>`; }
+  if(t.due === tk) return `<span class="today">Today</span>`;
+  if(t.due === addDays(tk, 1)) return `<span>Tomorrow</span>`;
+  return `<span>${esc(fmtDay(t.due))}</span>`;
+}
+function renderList(){
+  const tk = today(), all = W().tasks, open = all.filter(x => !x.done);
+  q('#wkNOpen').textContent = open.length || '';
+  q('#wkNToday').textContent = open.filter(x => x.due && x.due <= tk).length || '';
+  q('#wkNUpcoming').textContent = open.filter(x => !x.due || x.due > tk).length || '';
+  q('#wkNDone').textContent = all.filter(x => x.done).length || '';
+  document.querySelectorAll('#wkFilters .chip').forEach(b => b.classList.toggle('on', b.dataset.f === filter));
+
+  const cats = [...new Set(all.map(x => x.category).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+  if(cat && !cats.includes(cat)) cat = '';
+  q('#wkCats').innerHTML = cats.map(c => `<option value="${esc(c)}">`).join('');
+  q('#wkCatFilter').innerHTML = '<option value="">All categories</option>' + cats.map(c => `<option value="${esc(c)}"${c === cat ? ' selected' : ''}>${esc(c)}</option>`).join('');
+
+  const ts = visible(), list = q('#wkList');
+  if(!ts.length){
+    const msg = { open: ['Nothing open', all.length ? 'Everything is ticked off. Add the next thing.' : 'Add your first work task above.'],
+      today: ['Nothing due today', 'No overdue or due-today tasks.'], upcoming: ['Nothing upcoming', 'No tasks scheduled ahead.'],
+      done: ['Nothing finished yet', 'Completed tasks will show here.'] }[filter];
+    list.innerHTML = `<div class="wk-empty"><b>${msg[0]}</b>${msg[1]}</div>`; return;
+  }
+  list.innerHTML = ts.map(x => `
+    <div class="wk-task${x.done ? ' done' : ''}" data-id="${esc(x.id)}" data-p="${esc(x.priority || 'medium')}">
+      <button type="button" class="wk-check" aria-label="${x.done ? 'Mark as not done' : 'Mark done'}" aria-pressed="${x.done}"><svg viewBox="0 0 16 16"><path d="M3 8.5l3.2 3L13 4.5"/></svg></button>
+      <div class="wk-body">
+        <button type="button" class="wk-title" aria-label="Edit task: ${esc(x.title)}">${esc(x.title)}</button>
+        <div class="wk-meta">
+          ${x.category ? `<span class="cat">${esc(x.category)}</span>` : ''}
+          ${x.priority === 'high' ? '<span>High priority</span>' : x.priority === 'low' ? '<span class="plain">Low priority</span>' : ''}
+          ${dueChip(x)}
+          ${x.estimate ? `<span class="plain">${fmtMin(x.estimate)}</span>` : ''}
+          ${x.done && x.completedAt ? `<span class="plain">Done ${esc(fmtDay(dayKey(x.completedAt)))}</span>` : ''}
+        </div>
+      </div>
+    </div>`).join('');
+}
+q('#wkList').addEventListener('click', e => {
+  const row = e.target.closest('.wk-task'); if(!row) return;
+  const t = W().tasks.find(x => x.id === row.dataset.id); if(!t) return;
+  if(e.target.closest('.wk-check')){
+    const done = !t.done;
+    upsert({ ...t, done, completedAt: done ? new Date().toISOString() : null });
+    if(done) toast('Done. Nice one.');
+  } else if(e.target.closest('.wk-title')) openEditor(t);
+});
+
+/* ----- editor ----- */
+function openEditor(t){
+  editing = t;
+  q('#wk_e_title').value = t.title; q('#wk_e_cat').value = t.category || ''; q('#wk_e_pri').value = t.priority || 'medium';
+  q('#wk_e_due').value = t.due || ''; q('#wk_e_est').value = t.estimate || '';
+  q('#wkEditor').showModal();
+}
+q('#wk_e_cancel').addEventListener('click', () => q('#wkEditor').close());
+q('#wkEditForm').addEventListener('submit', e => {
+  e.preventDefault(); if(!editing) return;
+  const title = q('#wk_e_title').value.trim(); if(!title) return;
+  const est = parseInt(q('#wk_e_est').value, 10);
+  upsert({ ...editing, title, category: q('#wk_e_cat').value.trim(), priority: q('#wk_e_pri').value, due: q('#wk_e_due').value || null, estimate: est > 0 ? est : null });
+  q('#wkEditor').close();
+});
+q('#wk_e_delete').addEventListener('click', () => {
+  if(!editing) return; const id = editing.id; q('#wkEditor').close(); remove(id); toast('Deleted');
+});
+
+/* ----- analytics ----- */
+function analytics(){
+  const tasks = W().tasks, tk = today();
+  const done = tasks.filter(t => t.done && t.completedAt), open = tasks.filter(t => !t.done);
+  const byDay = {}; done.forEach(t => { const k = dayKey(t.completedAt); byDay[k] = (byDay[k] || 0) + 1; });
+  const todayCount = byDay[tk] || 0;
+  let streak = 0, k = todayCount ? tk : addDays(tk, -1);
+  while(byDay[k]){ streak++; k = addDays(k, -1); }
+  const ws = weekStart(tk), lws = addDays(ws, -7), nws = addDays(ws, 7);
+  const thisWeek = done.filter(t => { const d = dayKey(t.completedAt); return d >= ws && d < nws; });
+  const lastWeek = done.filter(t => { const d = dayKey(t.completedAt); return d >= lws && d < ws; });
+  const withDue = done.filter(t => t.due), onTime = withDue.filter(t => dayKey(t.completedAt) <= t.due);
+  const cycles = done.map(t => (new Date(t.completedAt) - new Date(t.createdAt))/36e5).filter(h => h >= 0);
+  const avgCycle = cycles.length ? cycles.reduce((a, b) => a + b, 0)/cycles.length : null;
+  const days = []; for(let i = 29; i >= 0; i--){ const kk = addDays(tk, -i); days.push({ key: kk, n: byDay[kk] || 0 }); }
+  const wd = Array(7).fill(0); for(let i = 55; i >= 0; i--){ const kk = addDays(tk, -i); wd[dowMon(kk)] += byDay[kk] || 0; }
+  const cats = {}; tasks.forEach(t => { const c = t.category || 'Uncategorised'; cats[c] = cats[c] || { done:0, open:0 }; cats[c][t.done ? 'done' : 'open']++; });
+  const overdue = open.filter(t => t.due && t.due < tk);
+  const minutesThisWeek = thisWeek.reduce((a, t) => a + (t.estimate || 0), 0);
+  const minutesOpen = open.reduce((a, t) => a + (t.estimate || 0), 0);
+  const highOpen = open.filter(t => t.priority === 'high').length;
+  const first = tasks.length ? tasks.map(t => t.createdAt).sort()[0] : null;
+  return { done, open, todayCount, streak, thisWeek, lastWeek, withDue, onTime, avgCycle, days, wd, cats, overdue, minutesThisWeek, minutesOpen, highOpen, first, activeDays: Object.keys(byDay).length };
+}
+function renderProgress(){
+  const a = analytics(), delta = a.thisWeek.length - a.lastWeek.length;
+  const onTimePct = a.withDue.length ? Math.round(a.onTime.length / a.withDue.length * 100) : null;
+  q('#wkTiles').innerHTML = `
+    <div class="wk-tile"><div class="l">Done today</div><div class="v">${a.todayCount}</div><div class="s">${a.open.length} still open</div></div>
+    <div class="wk-tile"><div class="l">Streak</div><div class="v">${a.streak}<small>${a.streak === 1 ? 'day' : 'days'}</small></div><div class="s">${a.streak && !a.todayCount ? 'Finish one today to keep it' : a.streak ? 'Days in a row with a task done' : 'Finish a task to start one'}</div></div>
+    <div class="wk-tile"><div class="l">This week</div><div class="v">${a.thisWeek.length}</div><div class="s ${delta > 0 ? 'up' : delta < 0 ? 'down' : ''}">${delta > 0 ? '▲ ' + delta + ' vs' : delta < 0 ? '▼ ' + Math.abs(delta) + ' vs' : 'Same as'} last week (${a.lastWeek.length})</div></div>
+    <div class="wk-tile"><div class="l">On time</div><div class="v">${onTimePct == null ? '–' : onTimePct + '<small>%</small>'}</div><div class="s">${a.withDue.length ? a.onTime.length + ' of ' + a.withDue.length + ' dated tasks' : 'No dated tasks finished yet'}</div></div>`;
+  renderDaysChart(a); renderWeekChart(a);
+  const rows = Object.entries(a.cats).sort((x, y) => (y[1].done + y[1].open) - (x[1].done + x[1].open)).slice(0, 8);
+  const max = Math.max(1, ...rows.map(([, v]) => v.done + v.open));
+  q('#wkCatsChart').innerHTML = rows.length ? rows.map(([name, v]) => `<div class="name" title="${esc(name)}">${esc(name)}</div>
+      <div class="bar" role="img" aria-label="${esc(name)}: ${v.done} done, ${v.open} open">${v.done ? `<i class="d" style="width:${v.done/max*100}%"></i>` : ''}${v.open ? `<i class="o" style="width:${v.open/max*100}%"></i>` : ''}</div>
+      <div class="nums">${v.done} done · ${v.open} open</div>`).join('')
+    : '<div class="nums" style="grid-column:1/-1">Add a category to tasks to see this breakdown.</div>';
+  const fig = (l, v, s) => `<div><dt>${l}${s ? `<small>${s}</small>` : ''}</dt><dd>${v}</dd></div>`;
+  q('#wkFigs').innerHTML =
+    fig('Tasks completed', a.done.length, a.first ? 'since ' + fmtDay(dayKey(a.first)) : '') +
+    fig('Overdue right now', a.overdue.length, a.highOpen ? a.highOpen + ' high priority still open' : '') +
+    fig('Average time to finish', fmtHours(a.avgCycle), 'from adding a task to ticking it off') +
+    fig('Planned work cleared this week', a.minutesThisWeek ? fmtMin(a.minutesThisWeek) : '–', 'estimates on tasks done this week') +
+    fig('Planned work still open', a.minutesOpen ? fmtMin(a.minutesOpen) : '–', 'estimates on open tasks') +
+    fig('Active days', a.activeDays, 'days with at least one task done');
+}
+function tipFor(c){ let t = c.querySelector('.wk-tip'); if(!t){ t = document.createElement('div'); t.className = 'wk-tip'; c.appendChild(t); } return t; }
+function bindHover(c, items){
+  const tip = tipFor(c);
+  c.querySelectorAll('g[data-i]').forEach(g => {
+    const it = items[+g.dataset.i];
+    const show = () => { tip.innerHTML = it.html; tip.style.left = it.x + '%'; tip.style.top = it.y + 'px'; tip.classList.add('on'); };
+    g.addEventListener('mouseenter', show); g.addEventListener('touchstart', show, { passive:true });
+    g.addEventListener('mouseleave', () => tip.classList.remove('on'));
+  });
+}
+function renderDaysChart(a){
+  const c = q('#wkChartDays'), Wd = Math.max(260, c.clientWidth || 480), H = 170;
+  const L = 26, R = 6, T = 22, B = 26, pw = Wd - L - R, ph = H - T - B;
+  const n = a.days.length, slot = pw / n, gap = 2, bw = Math.max(3, slot - gap), rx = Math.min(4, bw / 2);
+  const max = Math.max(1, ...a.days.map(d => d.n)), nice = max <= 5 ? max : Math.ceil(max / 5) * 5;
+  const y = v => T + ph - v / nice * ph;
+  const maxIdx = a.days.reduce((m, d, i) => d.n > a.days[m].n ? i : m, 0);
+  let s = `<svg viewBox="0 0 ${Wd} ${H}" width="${Wd}" height="${H}" role="img" aria-label="Tasks done per day, last 30 days">`;
+  [0, nice / 2, nice].forEach(v => { if(v !== Math.floor(v)) return; s += `<line x1="${L}" x2="${Wd - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${v}</text>`; });
+  const items = [];
+  a.days.forEach((d, i) => {
+    const x = L + i * slot + gap / 2, h = d.n ? Math.max(3, ph * d.n / nice) : 0, isToday = i === n - 1;
+    if(i % 7 === (n - 1) % 7) s += `<text x="${x + bw / 2}" y="${H - 8}" text-anchor="middle">${isToday ? 'Today' : fmtShort(d.key)}</text>`;
+    s += `<g data-i="${i}"><rect class="hit" x="${L + i * slot}" y="${T}" width="${slot}" height="${ph}"/>`;
+    if(d.n) s += `<rect x="${x}" y="${y(d.n)}" width="${bw}" height="${h}" rx="${rx}" fill="${isToday ? 'var(--accent)' : 'var(--accent2)'}"/>`;
+    if(i === maxIdx && d.n) s += `<text class="lv" x="${x + bw / 2}" y="${y(d.n) - 6}" text-anchor="middle">${d.n}</text>`;
+    s += `</g>`;
+    items.push({ html: `${esc(fmtDay(d.key))} · <b>${d.n}</b> done`, x: (L + (i + .5) * slot) / Wd * 100, y: y(d.n) });
+  });
+  s += `<line x1="${L}" x2="${Wd - R}" y1="${T + ph}" y2="${T + ph}" stroke="var(--dim)" stroke-opacity=".5"/></svg>`;
+  c.innerHTML = s; bindHover(c, items);
+  q('#wkTblDays').innerHTML = `<table><thead><tr><th>Day</th><th class="n">Done</th></tr></thead><tbody>${a.days.slice().reverse().map(d => `<tr><td>${esc(fmtDay(d.key))}</td><td class="n">${d.n}</td></tr>`).join('')}</tbody></table>`;
+}
+function renderWeekChart(a){
+  const c = q('#wkChartWeek'), Wd = Math.max(240, c.clientWidth || 480), H = 150;
+  const L = 26, R = 6, T = 22, B = 24, pw = Wd - L - R, ph = H - T - B;
+  const vals = a.wd.map(v => v / 8), slot = pw / 7, gap = Math.max(2, slot * .3), bw = slot - gap;
+  const max = Math.max(0.5, ...vals), nice = Math.ceil(max * 2) / 2;
+  const y = v => T + ph - v / nice * ph;
+  const maxIdx = vals.reduce((m, v, i) => v > vals[m] ? i : m, 0), td = dowMon(today());
+  let s = `<svg viewBox="0 0 ${Wd} ${H}" width="${Wd}" height="${H}" role="img" aria-label="Average tasks done by weekday">`;
+  [0, nice].forEach(v => { s += `<line x1="${L}" x2="${Wd - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${v}</text>`; });
+  const items = [];
+  vals.forEach((v, i) => {
+    const x = L + i * slot + gap / 2, h = v ? Math.max(3, ph * v / nice) : 0;
+    s += `<text x="${x + bw / 2}" y="${H - 6}" text-anchor="middle"${i === td ? ' class="lv"' : ''}>${DAYS[i]}</text>`;
+    s += `<g data-i="${i}"><rect class="hit" x="${L + i * slot}" y="${T}" width="${slot}" height="${ph}"/>`;
+    if(v) s += `<rect x="${x}" y="${y(v)}" width="${bw}" height="${h}" rx="4" fill="var(--accent2)"/>`;
+    if(i === maxIdx && v) s += `<text class="lv" x="${x + bw / 2}" y="${y(v) - 6}" text-anchor="middle">${Math.round(v * 10) / 10}</text>`;
+    s += `</g>`;
+    items.push({ html: `${DAYS[i]} · <b>${Math.round(v * 10) / 10}</b> avg (${a.wd[i]} total)`, x: (L + (i + .5) * slot) / Wd * 100, y: y(v) });
+  });
+  s += `<line x1="${L}" x2="${Wd - R}" y1="${T + ph}" y2="${T + ph}" stroke="var(--dim)" stroke-opacity=".5"/></svg>`;
+  c.innerHTML = s; bindHover(c, items);
+}
+let rt = null;
+window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => {
+  if(view === 'progress' && !document.getElementById('work').classList.contains('hidden')) renderProgress(); }, 120); });
+})();
+</script>
+
 <!-- ============ FIREBASE SYNC (live laptop ↔ phone) ============ -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -752,7 +1210,8 @@ const firebaseConfig = {
 
 const NOT_SET = firebaseConfig.apiKey === "PASTE_ME";
 const setStatus = h => window.__setSyncStatus && window.__setSyncStatus(h);
-const dataJSON  = d => JSON.stringify({tasks:d.tasks||[], log:d.log||[]});
+const emptyWork = ()=>({goal:'', tasks:[]});
+const dataJSON  = d => JSON.stringify({tasks:d.tasks||[], log:d.log||[], work:d.work||emptyWork()});
 const btn = label => '<button onclick="signInGoogle()" style="background:#fff1e6;border:1px solid #f1e6d8;color:#3a332e;padding:9px 14px;border-radius:999px;font-weight:700;font-size:13px;cursor:pointer"><i class="ph ph-cloud"></i> '+label+'</button>';
 const signOutLink = '<a href="#" onclick="signOutMomentum();return false" style="color:#a0917f">sign out</a>';
 
@@ -762,7 +1221,10 @@ function unionData(local, remote){            // one-time merge so pre-sync task
   (local.tasks||[]).forEach(t=>{ if(!byId[t.id]) byId[t.id]=t; });
   const seen=new Set(), log=[];
   [...(remote.log||[]), ...(local.log||[])].forEach(l=>{ const k=(l.at||l.d); if(!seen.has(k)){ seen.add(k); log.push(l);} });
-  return { tasks:Object.values(byId), log };
+  const rw=remote.work||emptyWork(), lw=local.work||emptyWork(), wById={};   // work tasks: same union, by id
+  (rw.tasks||[]).forEach(t=>wById[t.id]=t);
+  (lw.tasks||[]).forEach(t=>{ if(!wById[t.id]) wById[t.id]=t; });
+  return { tasks:Object.values(byId), log, work:{ goal:rw.goal||lw.goal||'', tasks:Object.values(wById) } };
 }
 
 if(NOT_SET){
@@ -803,7 +1265,7 @@ if(NOT_SET){
       const d=window.__syncGetData(), js=dataJSON(d);
       if(js===lastJSON) return;                // nothing actually changed
       lastJSON=js;
-      try{ await setDoc(userDoc,{tasks:d.tasks, log:d.log, updatedAt:serverTimestamp()}); }catch(e){}
+      try{ await setDoc(userDoc,{tasks:d.tasks, log:d.log, work:d.work||emptyWork(), updatedAt:serverTimestamp()}); }catch(e){}
     },600);
   };
 
@@ -816,7 +1278,7 @@ if(NOT_SET){
       const local=window.__syncGetData();
       if(!snap.exists()){                      // first device ever → push local up
         lastJSON=dataJSON(local);
-        setDoc(userDoc,{tasks:local.tasks, log:local.log, updatedAt:serverTimestamp()}).catch(()=>{});
+        setDoc(userDoc,{tasks:local.tasks, log:local.log, work:local.work||emptyWork(), updatedAt:serverTimestamp()}).catch(()=>{});
         setStatus(ok(u)); return;
       }
       const remote=snap.data();
@@ -825,11 +1287,15 @@ if(NOT_SET){
         const merged=unionData(local,remote);
         window.__applyRemote(merged); lastJSON=dataJSON(merged);
         if(dataJSON(merged)!==dataJSON(remote))
-          setDoc(userDoc,{tasks:merged.tasks, log:merged.log, updatedAt:serverTimestamp()}).catch(()=>{});
+          setDoc(userDoc,{tasks:merged.tasks, log:merged.log, work:merged.work, updatedAt:serverTimestamp()}).catch(()=>{});
         setStatus(ok(u)); return;
       }
+      // an older build on another device writes the doc without `work` — never let that wipe it
+      const keepWork = !remote.work && local.work && (local.work.tasks||[]).length;
+      if(keepWork){ remote={...remote, work:local.work}; }
       const rjs=dataJSON(remote);               // ongoing: cloud is the source of truth
-      if(rjs!==dataJSON(local)){ window.__applyRemote({tasks:remote.tasks, log:remote.log}); lastJSON=rjs; }
+      if(rjs!==dataJSON(local)){ window.__applyRemote({tasks:remote.tasks, log:remote.log, work:remote.work}); lastJSON=rjs; }
+      if(keepWork){ lastJSON=rjs; setDoc(userDoc,{tasks:remote.tasks, log:remote.log, work:remote.work, updatedAt:serverTimestamp()}).catch(()=>{}); }
       setStatus(ok(u));
     }, err=> setStatus('<i class="ph ph-warning"></i> sync error: '+err.code));
   });
