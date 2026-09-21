@@ -57,7 +57,8 @@ One-time, ~10 minutes. You click through the console; the code is already writte
 
 ## How it works (so future-you remembers)
 - **Local-first:** tasks are always in the browser's `localStorage`; the app works with zero network.
-- **Sync:** when signed in, every change is pushed (debounced) to `users/{your-uid}` in Firestore, and a live listener pulls remote changes back. On first sign-in on a device, local + cloud tasks are **merged** (nothing lost); after that, the cloud is the source of truth.
+- **Sync:** when signed in, every change is pushed (debounced) to `users/{your-uid}` in Firestore, and a live listener pulls remote changes back.
+- **Merge, never replace:** every task carries `updatedAt`; deleted ids are kept as markers in `gone`. Each push is a transaction that reads the live cloud copy, merges it with this device item by item (newer edit wins, ties go to the cloud, a delete beats older copies) and writes the result. A device never pushes until it has heard from the server once in that session, so a stale phone cannot overwrite a fresher cloud. Changes made offline or interrupted by a reload stay marked dirty and go up on the next connection.
 - **Conflict note:** if you edit the *same* data on two devices while *both* are offline, the last one to reconnect wins. For solo use this is rarely an issue.
 
 ## Free-tier headroom

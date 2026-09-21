@@ -511,15 +511,16 @@ let filterMin = 0, mood = null;
 let pendingNext = null;                 // a paired follow-on task queued after Done
 const RING_C = 327;   // circumference of the r=52 timer ring
 
-function normWork(w){ w = w || {}; return { goal: typeof w.goal === 'string' ? w.goal : '', tasks: Array.isArray(w.tasks) ? w.tasks : [] }; }
+function normWork(w){ w = w || {}; return { goal: typeof w.goal === 'string' ? w.goal : '', goalAt: +w.goalAt || 0, tasks: Array.isArray(w.tasks) ? w.tasks : [] }; }
 function load(){
   try{
     const d = JSON.parse(localStorage.getItem(KEY)) || {};
-    return { tasks:d.tasks||[], log:d.log||[], work:normWork(d.work), settings:Object.assign({muted:false, tick:false}, d.settings||{}) };
-  }catch(e){ return {tasks:[], log:[], work:normWork(null), settings:{muted:false, tick:false}}; }
+    return { tasks:d.tasks||[], log:d.log||[], work:normWork(d.work), gone:Array.isArray(d.gone)?d.gone:[], settings:Object.assign({muted:false, tick:false}, d.settings||{}) };
+  }catch(e){ return {tasks:[], log:[], work:normWork(null), gone:[], settings:{muted:false, tick:false}}; }
 }
 function saveLocalOnly(){ localStorage.setItem(KEY, JSON.stringify(state)); }
-function save(){ saveLocalOnly(); if(window.__syncPush) window.__syncPush(); }
+function save(){ saveLocalOnly(); try{ localStorage.setItem('momentum.dirty','1'); }catch(e){} if(window.__syncPush) window.__syncPush(); }
+function forget(id){ state.gone=(state.gone||[]).filter(g=>g.id!==id).concat({id, at:Date.now()}); }   // delete marker so a merge can't bring it back
 function uid(){ return Math.random().toString(36).slice(2,9); }
 function todayKey(){ const d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
 
@@ -618,7 +619,7 @@ function pickTask(){
 function startServe(t){
   currentId = t.id;
   started = false;
-  t.lastShownAt = Date.now(); save();
+  t.lastShownAt = Date.now(); t.updatedAt = Date.now(); save();
   const step = currentStep(t);
   remaining = total = step.min*60;
   renderServe(t);
@@ -731,7 +732,7 @@ function doneStep(){
   const steps=getSteps(t);
   const idx=Math.min(t.stepIndex||0, steps.length-1);
   if(idx < steps.length-1){
-    t.stepIndex = idx+1;                 // advance — stay on screen, no full celebration
+    t.stepIndex = idx+1; t.updatedAt = Date.now();   // advance — stay on screen, no full celebration
     logStartIfNew();
     save();
     playStepDing();
@@ -746,7 +747,7 @@ function doneStep(){
 }
 function completeTask(t){
   logStartIfNew();                       // we celebrate STARTS; completion is a bonus
-  t.lastCompletedAt = Date.now();
+  t.lastCompletedAt = Date.now(); t.updatedAt = Date.now();
   if(t.recur){ t.stepIndex = 0; t.done = false; }   // repeating → reset & re-open (cooldown handled in pickTask)
   else { t.done = true; }
   pendingNext = (t.then && state.tasks.find(x=>x.id===t.then && !x.done)) ? t.then : null;
@@ -843,7 +844,7 @@ function saveTask(){
     moods,
     recur:document.getElementById('f_recur').checked,
     then:document.getElementById('f_then').value||null,
-    createdAt:Date.now(), lastShownAt:0, lastCompletedAt:0, stepIndex:0, done:false
+    createdAt:Date.now(), updatedAt:Date.now(), lastShownAt:0, lastCompletedAt:0, stepIndex:0, done:false
   };
   if(steps.length){ task.steps=steps; task.userSteps=true; if(!first) task.first=steps[0].text; }
   state.tasks.push(task);
@@ -873,7 +874,7 @@ function renderList(){
         </div></div>`;
     }).join('');
 }
-function delTask(id){ state.tasks=state.tasks.filter(t=>t.id!==id); save(); renderList(); }
+function delTask(id){ state.tasks=state.tasks.filter(t=>t.id!==id); forget(id); save(); renderList(); }
 
 /* ---------- stat (no streaks, no guilt) ---------- */
 function renderStat(){
@@ -898,8 +899,8 @@ function rerenderCurrent(){
     if(!timer){ const t=state.tasks.find(x=>x.id===currentId); if(t) renderServe(t); }
   }
 }
-window.__syncGetData = ()=>({tasks:state.tasks, log:state.log, work:state.work});
-window.__applyRemote = (data)=>{ state.tasks=data.tasks||[]; state.log=data.log||[]; state.work=normWork(data.work); saveLocalOnly(); rerenderCurrent(); };
+window.__syncGetData = ()=>({tasks:state.tasks, log:state.log, work:state.work, gone:state.gone||[]});
+window.__applyRemote = (data)=>{ state.tasks=data.tasks||[]; state.log=data.log||[]; state.work=normWork(data.work); state.gone=Array.isArray(data.gone)?data.gone:[]; saveLocalOnly(); rerenderCurrent(); };
 window.__setSyncStatus = (html)=>{ const b=document.getElementById('syncBar'); if(b) b.innerHTML=html; };
 
 renderStat();
@@ -914,7 +915,10 @@ if('serviceWorker' in navigator){
     // skip the very first install (no prior controller) to avoid a needless reload,
     // and never reload mid sign-in (it would drop the auth result).
     if(refreshing || !hadController || window.__authBusy) return;
-    refreshing=true; window.location.reload();
+    refreshing=true;
+    const go=()=>window.location.reload();
+    if(window.__syncFlush) Promise.race([window.__syncFlush(), new Promise(r=>setTimeout(r,4000))]).then(go, go);
+    else go();
   });
   navigator.serviceWorker.register('sw.js').then(reg=>{
     reg.update();                                   // check for a new version now
@@ -956,8 +960,8 @@ try{ if(localStorage.getItem('wk.view') === 'progress') view = 'progress';
 
 const W = () => state.work;
 function commit(){ save(); renderWork(); }
-function upsert(t){ const ts = W().tasks; const i = ts.findIndex(x => x.id === t.id); if(i >= 0) ts[i] = t; else ts.push(t); commit(); }
-function remove(id){ W().tasks = W().tasks.filter(x => x.id !== id); commit(); }
+function upsert(t){ t = { ...t, updatedAt: Date.now() }; const ts = W().tasks; const i = ts.findIndex(x => x.id === t.id); if(i >= 0) ts[i] = t; else ts.push(t); commit(); }
+function remove(id){ W().tasks = W().tasks.filter(x => x.id !== id); forget(id); commit(); }
 
 /* ----- entry points used by the rest of the app ----- */
 window.openWork = function(){ show('work'); renderWork(); };
@@ -984,7 +988,7 @@ q('#wkGoal').addEventListener('click', () => {
   b.classList.add('hidden'); b.insertAdjacentElement('afterend', input); input.focus();
   let done = false;
   const finish = ok => { if(done) return; done = true; const v = input.value.trim(); input.remove(); b.classList.remove('hidden');
-    if(ok && v !== (W().goal || '')){ W().goal = v; commit(); } else renderGoal(); };
+    if(ok && v !== (W().goal || '')){ W().goal = v; W().goalAt = Date.now(); commit(); } else renderGoal(); };
   input.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); finish(true); } if(e.key === 'Escape') finish(false); });
   input.addEventListener('blur', () => finish(true));
 });
@@ -1273,7 +1277,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager,
-         doc, setDoc, onSnapshot, serverTimestamp }
+         doc, runTransaction, onSnapshot, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 /* ⬇️⬇️ PASTE YOUR FIREBASE CONFIG HERE ⬇️⬇️
@@ -1288,33 +1292,62 @@ const firebaseConfig = {
 
 const NOT_SET = firebaseConfig.apiKey === "PASTE_ME";
 const setStatus = h => window.__setSyncStatus && window.__setSyncStatus(h);
-const emptyWork = ()=>({goal:'', tasks:[]});
-const dataJSON  = d => JSON.stringify({tasks:d.tasks||[], log:d.log||[], work:d.work||emptyWork()});
 const btn = label => '<button onclick="signInGoogle()" style="background:#fff1e6;border:1px solid #f1e6d8;color:#3a332e;padding:9px 14px;border-radius:999px;font-weight:700;font-size:13px;cursor:pointer"><i class="ph ph-cloud"></i> '+label+'</button>';
 const signOutLink = '<a href="#" onclick="signOutMomentum();return false" style="color:#a0917f">sign out</a>';
 
-function unionData(local, remote){            // one-time merge so pre-sync tasks aren't lost
+/* ---------- merge, not replace ----------
+   Every task carries `updatedAt` (ms). Deleted ids live in `gone` as {id, at}.
+   Two copies of the data merge item by item: newer `updatedAt` wins, ties go to
+   the cloud copy, and a delete marker beats any copy not edited after it. The
+   result is the same whichever device runs it, so nothing one device did can
+   be wiped by another device writing an older picture of the world. */
+const emptyWork = ()=>({goal:'', goalAt:0, tasks:[]});
+const norm = d => { d=d||{}; const w=d.work||{}; return {
+  tasks:Array.isArray(d.tasks)?d.tasks:[], log:Array.isArray(d.log)?d.log:[],
+  work:{ goal:typeof w.goal==='string'?w.goal:'', goalAt:+w.goalAt||0, tasks:Array.isArray(w.tasks)?w.tasks:[] },
+  gone:Array.isArray(d.gone)?d.gone:[] }; };
+const canon = v => Array.isArray(v) ? v.map(canon)
+  : (v && typeof v==='object' && !(v.toDate)) ? Object.keys(v).sort().reduce((o,k)=>{ if(v[k]!==undefined) o[k]=canon(v[k]); return o; },{})
+  : v;
+const dataJSON = d => JSON.stringify(canon(norm(d)));
+function mergeItems(localArr, remoteArr, gone){
   const byId={};
-  (remote.tasks||[]).forEach(t=>byId[t.id]=t);
-  (local.tasks||[]).forEach(t=>{ if(!byId[t.id]) byId[t.id]=t; });
-  const seen=new Set(), log=[];
-  [...(remote.log||[]), ...(local.log||[])].forEach(l=>{ const k=(l.at||l.d); if(!seen.has(k)){ seen.add(k); log.push(l);} });
-  const rw=remote.work||emptyWork(), lw=local.work||emptyWork(), wById={};   // work tasks: same union, by id
-  (rw.tasks||[]).forEach(t=>wById[t.id]=t);
-  (lw.tasks||[]).forEach(t=>{ if(!wById[t.id]) wById[t.id]=t; });
-  return { tasks:Object.values(byId), log, work:{ goal:rw.goal||lw.goal||'', tasks:Object.values(wById) } };
+  const take=(t,isRemote)=>{ if(!t||!t.id) return; const cur=byId[t.id];
+    if(!cur){ byId[t.id]=t; return; }
+    const a=+cur.updatedAt||0, b=+t.updatedAt||0;
+    if(b>a || (b===a && isRemote)) byId[t.id]=t; };
+  localArr.forEach(t=>take(t,false)); remoteArr.forEach(t=>take(t,true));
+  return Object.values(byId).filter(t=>!(gone[t.id] && gone[t.id] >= (+t.updatedAt||0)));
 }
+function mergeData(localIn, remoteIn){
+  const local=norm(localIn), remote=norm(remoteIn), gone={};
+  [...remote.gone, ...local.gone].forEach(g=>{ if(g&&g.id&&(!gone[g.id]||gone[g.id]<g.at)) gone[g.id]=+g.at||0; });
+  const cutoff=Date.now()-60*864e5;                                  // forget delete markers after 60 days
+  const goneArr=Object.entries(gone).filter(([,at])=>at>cutoff).map(([id,at])=>({id,at}));
+  const seen=new Set(), log=[];
+  [...remote.log, ...local.log].forEach(l=>{ const k=(l.at||l.d); if(!seen.has(k)){ seen.add(k); log.push(l);} });
+  const g = (local.work.goalAt||0) > (remote.work.goalAt||0) ? local.work : remote.work;
+  return { tasks:mergeItems(local.tasks, remote.tasks, gone), log,
+           work:{ goal:g.goal||'', goalAt:g.goalAt||0, tasks:mergeItems(local.work.tasks, remote.work.tasks, gone) },
+           gone:goneArr };
+}
+window.__mergeData = mergeData;                                     // exposed for tests
+
+const dirty = { get:()=>{ try{ return localStorage.getItem('momentum.dirty')==='1'; }catch(e){ return false; } },
+                set:v=>{ try{ localStorage.setItem('momentum.dirty', v?'1':'0'); }catch(e){} } };
 
 if(NOT_SET){
   setStatus('<i class="ph ph-cloud-slash"></i> Sync off — paste your Firebase config in index.html');
   window.signInGoogle = ()=>alert('Add your Firebase config in index.html first (see the setup steps).');
+  window.__syncPush = ()=>{}; window.__syncFlush = ()=>Promise.resolve();
 } else {
   const app  = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db   = initializeFirestore(app, { localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }) });
 
-  let user=null, userDoc=null, lastJSON=null, mergedOnce=false, pushT=null;
+  let user=null, userDoc=null, serverSeen=false, pushing=false, pushAgain=false, pushT=null, unsub=null;
   const ok = u => '<i class="ph ph-cloud-check"></i> Synced · '+(u.email||'')+' '+signOutLink;
+  const pending = () => '<i class="ph ph-cloud-arrow-up"></i> '+(navigator.onLine?'syncing…':'offline — will sync when back online')+' '+signOutLink;
 
   window.signInGoogle = async ()=>{
     const provider = new GoogleAuthProvider();
@@ -1336,45 +1369,57 @@ if(NOT_SET){
   getRedirectResult(auth).catch(()=>{}).finally(()=>{ window.__authBusy = false; });
   window.signOutMomentum = ()=>signOut(auth);
 
-  window.__syncPush = ()=>{                    // debounced cloud write on every local change
+  /* One write path: a transaction reads the LIVE server copy, merges the local
+     state into it, and writes the result. Never runs before this session has
+     heard from the server at least once, so a stale device can't overwrite a
+     fresher cloud. Offline → the change stays local (dirty) and goes up later. */
+  async function pushMerged(){
+    if(!user||!userDoc){ return false; }
+    if(!serverSeen){ setStatus(pending()); return false; }
+    if(pushing){ pushAgain=true; return false; }
+    pushing=true; setStatus(pending());
+    try{
+      await runTransaction(db, async tx=>{
+        const snap=await tx.get(userDoc);
+        const merged=mergeData(window.__syncGetData(), snap.exists()?snap.data():{});
+        window.__applyRemote(merged);                              // local converges to what we write
+        tx.set(userDoc, {...merged, updatedAt:serverTimestamp()});
+      });
+      dirty.set(false); setStatus(ok(user)); return true;
+    }catch(e){
+      setStatus(pending()); return false;                          // keep dirty; retried on next server snapshot / online
+    }finally{
+      pushing=false;
+      if(pushAgain){ pushAgain=false; pushMerged(); }
+    }
+  }
+  window.__syncPush = ()=>{                    // debounced, on every local change
+    dirty.set(true);
     if(!user||!userDoc) return;
-    clearTimeout(pushT);
-    pushT=setTimeout(async ()=>{
-      const d=window.__syncGetData(), js=dataJSON(d);
-      if(js===lastJSON) return;                // nothing actually changed
-      lastJSON=js;
-      try{ await setDoc(userDoc,{tasks:d.tasks, log:d.log, work:d.work||emptyWork(), updatedAt:serverTimestamp()}); }catch(e){}
-    },600);
+    clearTimeout(pushT); pushT=setTimeout(pushMerged, 600);
   };
+  window.__syncFlush = ()=>{                   // immediate, used before reloads / when hidden
+    clearTimeout(pushT);
+    return dirty.get() ? pushMerged() : Promise.resolve(true);
+  };
+  document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden') window.__syncFlush(); });
+  window.addEventListener('online', ()=>{ if(dirty.get()) pushMerged(); });
 
   onAuthStateChanged(auth, u=>{
-    user=u; mergedOnce=false; userDoc=null;
+    user=u; userDoc=null; serverSeen=false;
+    if(unsub){ unsub(); unsub=null; }
     if(!u){ setStatus(btn('Sign in to sync laptop ↔ phone')); return; }
     userDoc=doc(db,'users',u.uid);
     setStatus('<i class="ph ph-cloud-arrow-up"></i> syncing…');
-    onSnapshot(userDoc, snap=>{
+    unsub=onSnapshot(userDoc, { includeMetadataChanges:true }, snap=>{
+      if(snap.metadata.fromCache) return;      // only the server's word counts; local state already works offline
       const local=window.__syncGetData();
-      if(!snap.exists()){                      // first device ever → push local up
-        lastJSON=dataJSON(local);
-        setDoc(userDoc,{tasks:local.tasks, log:local.log, work:local.work||emptyWork(), updatedAt:serverTimestamp()}).catch(()=>{});
-        setStatus(ok(u)); return;
-      }
-      const remote=snap.data();
-      if(!mergedOnce){                          // one-time union with whatever was already here
-        mergedOnce=true;
-        const merged=unionData(local,remote);
-        window.__applyRemote(merged); lastJSON=dataJSON(merged);
-        if(dataJSON(merged)!==dataJSON(remote))
-          setDoc(userDoc,{tasks:merged.tasks, log:merged.log, work:merged.work, updatedAt:serverTimestamp()}).catch(()=>{});
-        setStatus(ok(u)); return;
-      }
-      // an older build on another device writes the doc without `work` — never let that wipe it
-      const keepWork = !remote.work && local.work && (local.work.tasks||[]).length;
-      if(keepWork){ remote={...remote, work:local.work}; }
-      const rjs=dataJSON(remote);               // ongoing: cloud is the source of truth
-      if(rjs!==dataJSON(local)){ window.__applyRemote({tasks:remote.tasks, log:remote.log, work:remote.work}); lastJSON=rjs; }
-      if(keepWork){ lastJSON=rjs; setDoc(userDoc,{tasks:remote.tasks, log:remote.log, work:remote.work, updatedAt:serverTimestamp()}).catch(()=>{}); }
-      setStatus(ok(u));
+      const remote=snap.exists()?snap.data():{};
+      const merged=mergeData(local, remote);
+      serverSeen=true;
+      if(dataJSON(merged)!==dataJSON(local)) window.__applyRemote(merged);
+      if(dataJSON(merged)!==dataJSON(remote) || dirty.get()) pushMerged();
+      else setStatus(ok(u));
     }, err=> setStatus('<i class="ph ph-warning"></i> sync error: '+err.code));
   });
 }
